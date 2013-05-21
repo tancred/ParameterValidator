@@ -19,11 +19,11 @@
 	return self;
 }
 
-- (void)requireField:(NSString *)name conformsTo:(id)validator {
+- (void)validate:(NSString *)name with:(id)validator {
 	[self.validators addObject:@{@"field":name, @"validator":validator}];
 }
 
-- (BOOL)isPleasedWith:(id)parameters error:(NSError **)anError {
+- (BOOL)isPleasedWith:(NSDictionary *)parameters error:(NSError **)anError {
 	NSMutableSet *processedParameters = [NSMutableSet set];
 
 	for (NSDictionary *each in self.validators) {

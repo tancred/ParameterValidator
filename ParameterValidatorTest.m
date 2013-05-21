@@ -11,13 +11,13 @@
 
 - (void)testMandatoryPresent {
 	ParameterValidator *validator = [ParameterValidator validator];
-	[validator requireField:@"field" conformsTo:[FieldValidator validator]];
+	[validator validate:@"field" with:[FieldValidator validator]];
 	STAssertTrue([validator isPleasedWith:@{@"field":@"something"} error:nil], nil);
 }
 
 - (void)testMandatoryMissing {
 	ParameterValidator *validator = [ParameterValidator validator];
-	[validator requireField:@"field" conformsTo:[FieldValidator validator]];
+	[validator validate:@"field" with:[FieldValidator validator]];
 
 	NSError *error = nil;
 	STAssertFalse([validator isPleasedWith:@{@"fieldZ":@"something"} error:&error], nil);
@@ -26,25 +26,25 @@
 
 - (void)testOptionalPresent {
 	ParameterValidator *validator = [ParameterValidator validator];
-	[validator requireField:@"field" conformsTo:[[FieldValidator validator] optional]];
+	[validator validate:@"field" with:[[FieldValidator validator] optional]];
 	STAssertTrue([validator isPleasedWith:@{@"field":@"something"} error:nil], nil);
 }
 
 - (void)testOptionalMissing {
 	ParameterValidator *validator = [ParameterValidator validator];
-	[validator requireField:@"field" conformsTo:[[FieldValidator validator] optional]];
+	[validator validate:@"field" with:[[FieldValidator validator] optional]];
 	STAssertTrue([validator isPleasedWith:@{} error:nil], nil);
 }
 
 - (void)testPleasedWithField {
 	ParameterValidator *validator = [ParameterValidator validator];
-	[validator requireField:@"field" conformsTo:[[FieldValidator number] lessThan:@4]];
+	[validator validate:@"field" with:[[FieldValidator number] lessThan:@4]];
 	STAssertTrue([validator isPleasedWith:@{@"field":@3} error:nil], nil);
 }
 
 - (void)testNotPleasedWithField {
 	ParameterValidator *validator = [ParameterValidator validator];
-	[validator requireField:@"field" conformsTo:[[FieldValidator number] lessThan:@4]];
+	[validator validate:@"field" with:[[FieldValidator number] lessThan:@4]];
 
 	NSError *error = nil;
 	STAssertFalse([validator isPleasedWith:@{@"field":@4} error:&error], nil);
@@ -53,8 +53,8 @@
 
 - (void)testFieldsValidatedInOrder {
 	ParameterValidator *validator = [ParameterValidator validator];
-	[validator requireField:@"field1" conformsTo:[[FieldValidator number] lessThan:@4]];
-	[validator requireField:@"field2" conformsTo:[FieldValidator number]];
+	[validator validate:@"field1" with:[[FieldValidator number] lessThan:@4]];
+	[validator validate:@"field2" with:[FieldValidator number]];
 
 	NSError *error = nil;
 	STAssertFalse([validator isPleasedWith:(@{@"field1":@3, @"field2":@"str"}) error:&error], nil);
