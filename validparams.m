@@ -142,7 +142,7 @@ int main() {
 
 - (BOOL)isPleasedWith:(id)field error:(NSError **)anError {
 	if (![field isKindOfClass:[NSNumber class]]) {
-		if (anError) *anError = CreateError(0, @"not a number");
+		if (anError) *anError = CreateError(0, @"must be a number");
 		return NO;
 	}
 
@@ -216,7 +216,15 @@ int main() {
 				*anError = CreateError(0, @"missing required parameter '%@'", fieldName);
 			return NO;
 		}
+
+		NSError *fieldError = nil;
+		if (![fieldValidator isPleasedWith:fieldValue error:&fieldError]) {
+			if (anError)
+				*anError = CreateError(0, @"parameter '%@' %@", fieldName, [fieldError localizedDescription]);
+			return NO;
+		}
 	}
+
 	return YES;
 }
 
@@ -297,7 +305,7 @@ static NSError *CreateErrorFixedArgs(NSInteger code, NSString *descriptionFormat
 - (void)testNotPleasedWithNonNumber {
 	NSError *error = nil;
 	STAssertFalse([[FieldValidator number] isPleasedWith:@"two" error:&error], nil);
-	STAssertEqualObjects([error localizedDescription], @"not a number", nil);
+	STAssertEqualObjects([error localizedDescription], @"must be a number", nil);
 }
 
 - (void)testLessThan {
@@ -393,6 +401,31 @@ static NSError *CreateErrorFixedArgs(NSInteger code, NSString *descriptionFormat
 	ParameterValidator *validator = [ParameterValidator validator];
 	[validator requireField:@"field" conformsTo:[[FieldValidator validator] optional]];
 	STAssertTrue([validator isPleasedWith:@{@"fieldZ":@"something"} error:nil], nil);
+}
+
+- (void)testPleasedWithField {
+	ParameterValidator *validator = [ParameterValidator validator];
+	[validator requireField:@"field" conformsTo:[[FieldValidator number] lessThan:@4]];
+	STAssertTrue([validator isPleasedWith:@{@"field":@3} error:nil], nil);
+}
+
+- (void)testNotPleasedWithField {
+	ParameterValidator *validator = [ParameterValidator validator];
+	[validator requireField:@"field" conformsTo:[[FieldValidator number] lessThan:@4]];
+
+	NSError *error = nil;
+	STAssertFalse([validator isPleasedWith:@{@"field":@4} error:&error], nil);
+	STAssertEqualObjects([error localizedDescription], @"parameter 'field' must be less than 4", nil);
+}
+
+- (void)testFieldsValidatedInOrder {
+	ParameterValidator *validator = [ParameterValidator validator];
+	[validator requireField:@"field1" conformsTo:[[FieldValidator number] lessThan:@4]];
+	[validator requireField:@"field2" conformsTo:[FieldValidator number]];
+
+	NSError *error = nil;
+	STAssertFalse([validator isPleasedWith:(@{@"field1":@3, @"field2":@"str"}) error:&error], nil);
+	STAssertEqualObjects([error localizedDescription], @"parameter 'field2' must be a number", nil);
 }
 
 @end
