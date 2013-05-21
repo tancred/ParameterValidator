@@ -10,6 +10,7 @@
 	// Allow multiple validators for a field? Allow contradictions?
 @end
 
+
 @interface FieldValidator : NSObject
 @property BOOL isOptional; // used by ParameterValidator, not selfs -isPleasedWith:error:
 
@@ -55,6 +56,10 @@
 @end
 
 
+static NSError *CreateError(NSInteger code, NSString *descriptionFormat, ...) NS_FORMAT_FUNCTION(2, 3);
+static NSError *CreateErrorFixedArgs(NSInteger code, NSString *descriptionFormat, va_list args) NS_FORMAT_FUNCTION(2, 0);
+
+
 int main() {
 	@autoreleasepool {
 		return SenSelfTestMain();
@@ -80,6 +85,53 @@ int main() {
 	return self;
 }
 @end
+
+
+@implementation FieldValidator (ConstructionConvenience)
+
++ (NumberFieldValidator *)number {
+	return [NumberFieldValidator validator];
+}
+
++ (StringFieldValidator *)string {
+	return nil;
+}
+
++ (HexstringFieldValidator *)hexstring {
+	return nil;
+}
+
++ (ArrayFieldValidator *)array {
+	return nil;
+}
+
+@end
+
+
+@implementation NumberFieldValidator
+
+- (BOOL)isPleasedWith:(id)field error:(NSError **)anError {
+	if ([field isKindOfClass:[NSNumber class]]) return YES;
+	if (anError)
+		*anError = CreateError(0, @"not a number");
+	return NO;
+}
+
+@end
+
+
+static NSError *CreateError(NSInteger code, NSString *descriptionFormat, ...) {
+	va_list args;
+	va_start(args, descriptionFormat);
+	NSError *error = CreateErrorFixedArgs(code, descriptionFormat, args);
+	va_end(args);
+	return error;
+}
+
+static NSError *CreateErrorFixedArgs(NSInteger code, NSString *descriptionFormat, va_list args) {
+	NSString *description = [[NSString alloc] initWithFormat:descriptionFormat arguments:args];
+	return [NSError errorWithDomain:@"com.tancred.parametervalidator" code:code userInfo:@{NSLocalizedDescriptionKey: description}];
+}
 
 
 @interface FieldValidatorTest : SenTestCase
@@ -117,6 +169,33 @@ int main() {
 
 - (void)testAlwaysPleased {
 	STAssertTrue([[FieldValidator validator] isPleasedWith:nil error:nil], nil);
+}
+
+@end
+
+
+@interface NumberFieldValidatorTest : SenTestCase
+@end
+
+@implementation NumberFieldValidatorTest
+
+- (void)testInstance {
+	STAssertEqualObjects([[NumberFieldValidator validator] class], [NumberFieldValidator class], nil);
+}
+
+- (void)testConvenienceInstance {
+	STAssertEqualObjects([[FieldValidator number] class], [NumberFieldValidator class], nil);
+}
+
+- (void)testPleasedWithNumber {
+	STAssertTrue([[FieldValidator number] isPleasedWith:@2 error:nil], nil);
+}
+
+- (void)testNotPleasedWithNonNumber {
+	NSError *error = nil;
+	STAssertFalse([[FieldValidator number] isPleasedWith:@"two" error:&error], nil);
+	STAssertNotNil(error, nil);
+	STAssertEqualObjects([error localizedDescription], @"not a number", nil);
 }
 
 @end
