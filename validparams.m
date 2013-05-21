@@ -251,8 +251,7 @@ static NSError *CreateErrorFixedArgs(NSInteger code, NSString *descriptionFormat
 }
 
 - (void)testLessThan {
-	NSError *error = nil;
-	STAssertTrue([[[FieldValidator number] lessThan:@3] isPleasedWith:@2 error:&error], nil);
+	STAssertTrue([[[FieldValidator number] lessThan:@3] isPleasedWith:@2 error:nil], nil);
 }
 
 - (void)testLessThanError {
@@ -262,8 +261,7 @@ static NSError *CreateErrorFixedArgs(NSInteger code, NSString *descriptionFormat
 }
 
 - (void)testAtMost {
-	NSError *error = nil;
-	STAssertTrue([[[FieldValidator number] atMost:@3] isPleasedWith:@3 error:&error], nil);
+	STAssertTrue([[[FieldValidator number] atMost:@3] isPleasedWith:@3 error:nil], nil);
 }
 
 - (void)testAtMostError {
@@ -273,8 +271,7 @@ static NSError *CreateErrorFixedArgs(NSInteger code, NSString *descriptionFormat
 }
 
 - (void)testGreaterThan {
-	NSError *error = nil;
-	STAssertTrue([[[FieldValidator number] greaterThan:@3] isPleasedWith:@4 error:&error], nil);
+	STAssertTrue([[[FieldValidator number] greaterThan:@3] isPleasedWith:@4 error:nil], nil);
 }
 
 - (void)testGreaterThanError {
@@ -284,8 +281,7 @@ static NSError *CreateErrorFixedArgs(NSInteger code, NSString *descriptionFormat
 }
 
 - (void)testAtLeast {
-	NSError *error = nil;
-	STAssertTrue([[[FieldValidator number] atLeast:@3] isPleasedWith:@3 error:&error], nil);
+	STAssertTrue([[[FieldValidator number] atLeast:@3] isPleasedWith:@3 error:nil], nil);
 }
 
 - (void)testAtLeastError {
