@@ -22,7 +22,9 @@
 @end
 
 @interface NumberFieldValidator : FieldValidator
+@property (copy) NSNumber *low;
 @property (copy) NSNumber *high;
+@property (assign) BOOL lowInclusive;
 @property (assign) BOOL highInclusive;
 
 // no strict type checking; use other validator for that
@@ -126,17 +128,32 @@ int main() {
 }
 
 - (instancetype)atLeast:(NSNumber *)limit {
-	return nil;
+	self.low = limit;
+	self.lowInclusive = YES;
+	return self;
 }
 
 - (instancetype)greaterThan:(NSNumber *)limit {
-	return nil;
+	self.low = limit;
+	self.lowInclusive = NO;
+	return self;
 }
 
 - (BOOL)isPleasedWith:(id)field error:(NSError **)anError {
 	if (![field isKindOfClass:[NSNumber class]]) {
 		if (anError) *anError = CreateError(0, @"not a number");
 		return NO;
+	}
+
+	if (self.low) {
+		NSComparisonResult r = [field compare:self.low];
+		if (!self.lowInclusive && r != NSOrderedDescending) {
+			if (anError) *anError = CreateError(0, @"must be greater than %@", self.low);
+			return NO;
+		} else if (self.lowInclusive && r == NSOrderedAscending) {
+			if (anError) *anError = CreateError(0, @"must be at least %@", self.low);
+			return NO;
+		}
 	}
 
 	if (self.high) {
@@ -230,38 +247,51 @@ static NSError *CreateErrorFixedArgs(NSInteger code, NSString *descriptionFormat
 - (void)testNotPleasedWithNonNumber {
 	NSError *error = nil;
 	STAssertFalse([[FieldValidator number] isPleasedWith:@"two" error:&error], nil);
-	STAssertNotNil(error, nil);
 	STAssertEqualObjects([error localizedDescription], @"not a number", nil);
 }
 
 - (void)testLessThan {
-	FieldValidator *validator = [[FieldValidator number] lessThan:@3];
 	NSError *error = nil;
-	STAssertTrue([validator isPleasedWith:@2 error:&error], nil);
-	STAssertNil(error, @"unexpected error -> %@", error);
+	STAssertTrue([[[FieldValidator number] lessThan:@3] isPleasedWith:@2 error:&error], nil);
 }
 
 - (void)testLessThanError {
-	FieldValidator *validator = [[FieldValidator number] lessThan:@3];
 	NSError *error = nil;
-	STAssertFalse([validator isPleasedWith:@3 error:&error], nil);
-	STAssertNotNil(error, nil);
+	STAssertFalse([[[FieldValidator number] lessThan:@3] isPleasedWith:@3 error:&error], nil);
 	STAssertEqualObjects([error localizedDescription], @"must be less than 3", nil);
 }
 
 - (void)testAtMost {
-	FieldValidator *validator = [[FieldValidator number] atMost:@3];
 	NSError *error = nil;
-	STAssertTrue([validator isPleasedWith:@3 error:&error], nil);
-	STAssertNil(error, @"unexpected error %@", error);
+	STAssertTrue([[[FieldValidator number] atMost:@3] isPleasedWith:@3 error:&error], nil);
 }
 
 - (void)testAtMostError {
-	FieldValidator *validator = [[FieldValidator number] atMost:@3];
 	NSError *error = nil;
-	STAssertFalse([validator isPleasedWith:@4 error:&error], nil);
-	STAssertNotNil(error, nil);
+	STAssertFalse([[[FieldValidator number] atMost:@3] isPleasedWith:@4 error:&error], nil);
 	STAssertEqualObjects([error localizedDescription], @"must be at most 3", nil);
+}
+
+- (void)testGreaterThan {
+	NSError *error = nil;
+	STAssertTrue([[[FieldValidator number] greaterThan:@3] isPleasedWith:@4 error:&error], nil);
+}
+
+- (void)testGreaterThanError {
+	NSError *error = nil;
+	STAssertFalse([[[FieldValidator number] greaterThan:@3] isPleasedWith:@3 error:&error], nil);
+	STAssertEqualObjects([error localizedDescription], @"must be greater than 3", nil);
+}
+
+- (void)testAtLeast {
+	NSError *error = nil;
+	STAssertTrue([[[FieldValidator number] atLeast:@3] isPleasedWith:@3 error:&error], nil);
+}
+
+- (void)testAtLeastError {
+	NSError *error = nil;
+	STAssertFalse([[[FieldValidator number] atLeast:@3] isPleasedWith:@2 error:&error], nil);
+	STAssertEqualObjects([error localizedDescription], @"must be at least 3", nil);
 }
 
 @end
