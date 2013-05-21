@@ -3,6 +3,7 @@
 
 @interface ParameterValidator : NSObject
 @property BOOL allowsExtraParameters;
++ (instancetype)validator;
 - (void)requireField:(NSString *)name conformsTo:(id)validator;
 - (BOOL)isPleasedWith:(id)parameters error:(NSError **)anError;
 	// Params normally dictionary but should really just respond to -objectForKey: and -allKeys (for checking extra parameters).
@@ -182,6 +183,22 @@ int main() {
 @end
 
 
+@implementation ParameterValidator
+
++ (instancetype)validator {
+	return [[self alloc] init];
+}
+
+- (void)requireField:(NSString *)name conformsTo:(id)validator {
+}
+
+- (BOOL)isPleasedWith:(id)parameters error:(NSError **)anError {
+	return YES;
+}
+
+@end
+
+
 static NSError *CreateError(NSInteger code, NSString *descriptionFormat, ...) {
 	va_list args;
 	va_start(args, descriptionFormat);
@@ -312,6 +329,18 @@ static NSError *CreateErrorFixedArgs(NSInteger code, NSString *descriptionFormat
 
 	STAssertFalse([validator isPleasedWith:@5 error:&error], nil);
 	STAssertEqualObjects([error localizedDescription], @"must be in [3,5)", nil);
+}
+
+@end
+
+
+@interface ParameterValidatorTest : SenTestCase
+@end
+
+@implementation ParameterValidatorTest
+
+- (void)testAlwaysPleased {
+	STAssertTrue([[ParameterValidator validator] isPleasedWith:nil error:nil], nil);
 }
 
 @end
