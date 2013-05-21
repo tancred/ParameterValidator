@@ -75,7 +75,7 @@ int main() {
 
 @implementation FieldValidator
 + (instancetype)validator {
-	return [[[self class] alloc] init];
+	return [[self alloc] init];
 }
 
 - (BOOL)isPleasedWith:(id)field error:(NSError **)anError {
