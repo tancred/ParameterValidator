@@ -183,16 +183,40 @@ int main() {
 @end
 
 
+@interface ParameterValidator ()
+@property (strong) NSMutableArray *validators;
+@end
+
+
 @implementation ParameterValidator
 
 + (instancetype)validator {
 	return [[self alloc] init];
 }
 
+- (id)init {
+	if (!(self = [super init])) return nil;
+	self.validators = [[NSMutableArray alloc] init];
+	return self;
+}
+
 - (void)requireField:(NSString *)name conformsTo:(id)validator {
+	[self.validators addObject:@{@"field":name, @"validator":validator}];
 }
 
 - (BOOL)isPleasedWith:(id)parameters error:(NSError **)anError {
+	for (NSDictionary *each in self.validators) {
+		NSString *fieldName = each[@"field"];
+		FieldValidator *fieldValidator = each[@"validator"];
+
+		NSString *fieldValue = parameters[fieldName];
+		if (!fieldValue) {
+			if (fieldValidator.isOptional) continue;
+			if (anError)
+				*anError = CreateError(0, @"missing required parameter '%@'", fieldName);
+			return NO;
+		}
+	}
 	return YES;
 }
 
@@ -341,6 +365,34 @@ static NSError *CreateErrorFixedArgs(NSInteger code, NSString *descriptionFormat
 
 - (void)testAlwaysPleased {
 	STAssertTrue([[ParameterValidator validator] isPleasedWith:nil error:nil], nil);
+	STAssertTrue([[ParameterValidator validator] isPleasedWith:@{} error:nil], nil);
+}
+
+- (void)testMandatoryPresent {
+	ParameterValidator *validator = [ParameterValidator validator];
+	[validator requireField:@"field" conformsTo:[FieldValidator validator]];
+	STAssertTrue([validator isPleasedWith:@{@"field":@"something"} error:nil], nil);
+}
+
+- (void)testMandatoryMissing {
+	ParameterValidator *validator = [ParameterValidator validator];
+	[validator requireField:@"field" conformsTo:[FieldValidator validator]];
+
+	NSError *error = nil;
+	STAssertFalse([validator isPleasedWith:@{@"fieldZ":@"something"} error:&error], nil);
+	STAssertEqualObjects([error localizedDescription], @"missing required parameter 'field'", nil);
+}
+
+- (void)testOptionalPresent {
+	ParameterValidator *validator = [ParameterValidator validator];
+	[validator requireField:@"field" conformsTo:[[FieldValidator validator] optional]];
+	STAssertTrue([validator isPleasedWith:@{@"field":@"something"} error:nil], nil);
+}
+
+- (void)testOptionalMissing {
+	ParameterValidator *validator = [ParameterValidator validator];
+	[validator requireField:@"field" conformsTo:[[FieldValidator validator] optional]];
+	STAssertTrue([validator isPleasedWith:@{@"fieldZ":@"something"} error:nil], nil);
 }
 
 @end
