@@ -33,7 +33,7 @@
 - (void)testOptionalMissing {
 	ParameterValidator *validator = [ParameterValidator validator];
 	[validator requireField:@"field" conformsTo:[[FieldValidator validator] optional]];
-	STAssertTrue([validator isPleasedWith:@{@"fieldZ":@"something"} error:nil], nil);
+	STAssertTrue([validator isPleasedWith:@{} error:nil], nil);
 }
 
 - (void)testPleasedWithField {
@@ -59,6 +59,18 @@
 	NSError *error = nil;
 	STAssertFalse([validator isPleasedWith:(@{@"field1":@3, @"field2":@"str"}) error:&error], nil);
 	STAssertEqualObjects([error localizedDescription], @"parameter 'field2' must be a number", nil);
+}
+
+- (void)testNotPleasedWithExtraParameters {
+	NSError *error = nil;
+	STAssertFalse([[ParameterValidator validator] isPleasedWith:(@{@"field1":@3, @"field2":@"str", @"field3":@2}) error:&error], nil);
+	STAssertEqualObjects([error localizedDescription], @"superflous parameters field1, field2, field3", nil);
+}
+
+- (void)testPleasedWithExtraParameters {
+	ParameterValidator *validator = [ParameterValidator validator];
+	validator.allowsExtraParameters = YES;
+	STAssertTrue([validator isPleasedWith:(@{@"field1":@3, @"field2":@"str", @"field3":@2}) error:nil], nil);
 }
 
 @end

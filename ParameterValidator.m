@@ -24,9 +24,13 @@
 }
 
 - (BOOL)isPleasedWith:(id)parameters error:(NSError **)anError {
+	NSMutableSet *processedParameters = [NSMutableSet set];
+
 	for (NSDictionary *each in self.validators) {
 		NSString *fieldName = each[@"field"];
 		FieldValidator *fieldValidator = each[@"validator"];
+
+		[processedParameters addObject:fieldName];
 
 		NSString *fieldValue = parameters[fieldName];
 		if (!fieldValue) {
@@ -40,6 +44,16 @@
 		if (![fieldValidator isPleasedWith:fieldValue error:&fieldError]) {
 			if (anError)
 				*anError = CreateError(0, @"parameter '%@' %@", fieldName, [fieldError localizedDescription]);
+			return NO;
+		}
+	}
+
+	if (!self.allowsExtraParameters) {
+		NSMutableSet *superflousParameters = [NSMutableSet setWithArray:[parameters allKeys]];
+		[superflousParameters minusSet:processedParameters];
+		if ([superflousParameters count]) {
+			if (anError)
+				*anError = CreateError(0, @"superflous parameters %@", [[[superflousParameters allObjects] sortedArrayUsingSelector:@selector(compare:)] componentsJoinedByString:@", "]);
 			return NO;
 		}
 	}
