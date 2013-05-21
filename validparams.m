@@ -145,26 +145,35 @@ int main() {
 		return NO;
 	}
 
+	BOOL lowFailed = NO;
+	BOOL highFailed = NO;
+
 	if (self.low) {
 		NSComparisonResult r = [field compare:self.low];
-		if (!self.lowInclusive && r != NSOrderedDescending) {
-			if (anError) *anError = CreateError(0, @"must be greater than %@", self.low);
-			return NO;
-		} else if (self.lowInclusive && r == NSOrderedAscending) {
-			if (anError) *anError = CreateError(0, @"must be at least %@", self.low);
-			return NO;
-		}
+		if (!self.lowInclusive && r != NSOrderedDescending) lowFailed = YES;
+		else if (self.lowInclusive && r == NSOrderedAscending) lowFailed = YES;
 	}
 
 	if (self.high) {
 		NSComparisonResult r = [field compare:self.high];
-		if (!self.highInclusive && r != NSOrderedAscending) {
-			if (anError) *anError = CreateError(0, @"must be less than %@", self.high);
-			return NO;
-		} else if (self.highInclusive && r == NSOrderedDescending) {
-			if (anError) *anError = CreateError(0, @"must be at most %@", self.high);
-			return NO;
-		}
+		if (!self.highInclusive && r != NSOrderedAscending) highFailed = YES;
+		else if (self.highInclusive && r == NSOrderedDescending) highFailed = YES;
+	}
+
+	if (self.low && self.high && (lowFailed || highFailed)) {
+		if (anError)
+			*anError = CreateError(0, @"must be in %@%@,%@%@", self.lowInclusive ? @"[" : @"(", self.low, self.high, self.highInclusive ? @"]" : @")");
+		return NO;
+	}
+	if (lowFailed) {
+		if (anError)
+			*anError = CreateError(0, @"must be %@ %@", self.lowInclusive ? @"at least" : @"greater than", self.low);
+		return NO;
+	}
+	if (highFailed) {
+		if (anError)
+			*anError = CreateError(0, @"must be %@ %@", self.highInclusive ? @"at most" : @"less than", self.high);
+		return NO;
 	}
 
 	return YES;
@@ -288,6 +297,21 @@ static NSError *CreateErrorFixedArgs(NSInteger code, NSString *descriptionFormat
 	NSError *error = nil;
 	STAssertFalse([[[FieldValidator number] atLeast:@3] isPleasedWith:@2 error:&error], nil);
 	STAssertEqualObjects([error localizedDescription], @"must be at least 3", nil);
+}
+
+- (void)testLowAndHigh {
+	STAssertTrue([[[[FieldValidator number] atLeast:@3] atMost:@5] isPleasedWith:@4 error:nil], nil);
+}
+
+- (void)testLowAndHighError {
+	FieldValidator *validator = [[[FieldValidator number] atLeast:@3] lessThan:@5];
+	NSError *error = nil;
+
+	STAssertFalse([validator isPleasedWith:@2 error:&error], nil);
+	STAssertEqualObjects([error localizedDescription], @"must be in [3,5)", nil);
+
+	STAssertFalse([validator isPleasedWith:@5 error:&error], nil);
+	STAssertEqualObjects([error localizedDescription], @"must be in [3,5)", nil);
 }
 
 @end
