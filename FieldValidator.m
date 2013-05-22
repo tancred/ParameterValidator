@@ -31,7 +31,7 @@
 }
 
 + (StringFieldValidator *)string {
-	return nil;
+	return [StringFieldValidator validator];
 }
 
 + (HexstringFieldValidator *)hexstring {
@@ -105,6 +105,20 @@
 	if (highFailed) {
 		if (anError)
 			*anError = CreateError(0, @"must be %@ %@", self.highInclusive ? @"at most" : @"less than", self.high);
+		return NO;
+	}
+
+	return YES;
+}
+
+@end
+
+
+@implementation StringFieldValidator
+
+- (BOOL)isPleasedWith:(id)field error:(NSError **)anError {
+	if (![field isKindOfClass:[NSString class]]) {
+		if (anError) *anError = CreateError(0, @"must be a string");
 		return NO;
 	}
 

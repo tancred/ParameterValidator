@@ -7,7 +7,7 @@ default: validparams
 
 validparams: validparams.o \
 ParameterValidator.o FieldValidator.o Error.o \
-ParameterValidatorTest.o FieldValidatorTest.o NumberFieldValidatorTest.o
+ParameterValidatorTest.o FieldValidatorTest.o NumberFieldValidatorTest.o StringFieldValidatorTest.o
 	$(CC) -o $@ $(CFLAGS) $^ -framework Foundation -framework SenTestingKit
 
 validparams.o: validparams.m
@@ -18,6 +18,7 @@ Error.o: Error.m Error.h
 ParameterValidatorTest.o: ParameterValidatorTest.m ParameterValidatorTest.h ParameterValidator.h FieldValidator.h
 FieldValidatorTest.o: FieldValidatorTest.m FieldValidatorTest.h FieldValidator.h
 NumberFieldValidatorTest.o: NumberFieldValidatorTest.m NumberFieldValidatorTest.h FieldValidator.h
+StringFieldValidatorTest.o: StringFieldValidatorTest.m StringFieldValidatorTest.h FieldValidator.h
 
 %.o: %.m
 	$(CC) -c $(CFLAGS) $<
