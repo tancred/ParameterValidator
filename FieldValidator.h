@@ -24,9 +24,11 @@
 @end
 
 @interface StringFieldValidator : FieldValidator
-- (instancetype)length:(NSUInteger)limit; // min == max
-- (instancetype)min:(NSUInteger)limit;
-- (instancetype)max:(NSUInteger)limit;
+@property (copy) NSNumber *min;
+@property (copy) NSNumber *max;
+- (instancetype)length:(NSNumber *)limit; // min == max
+- (instancetype)min:(NSNumber *)limit;
+- (instancetype)max:(NSNumber *)limit;
 @end
 
 @interface HexstringFieldValidator : StringFieldValidator

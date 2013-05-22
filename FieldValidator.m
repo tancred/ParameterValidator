@@ -116,12 +116,58 @@
 
 @implementation StringFieldValidator
 
+- (instancetype)length:(NSNumber *)limit {
+	[self min:limit];
+	[self max:limit];
+	return self;
+}
+
+- (instancetype)min:(NSNumber *)limit {
+	self.min = limit;
+	return self;
+}
+
+- (instancetype)max:(NSNumber *)limit {
+	self.max = limit;
+	return self;
+}
+
 - (BOOL)isPleasedWith:(id)field error:(NSError **)anError {
 	if (![field isKindOfClass:[NSString class]]) {
 		if (anError) *anError = CreateError(0, @"must be a string");
 		return NO;
 	}
 
+	BOOL minFailed = NO;
+	BOOL maxFailed = NO;
+
+	if (self.min)
+		minFailed = [field length] < ((NSUInteger)[self.min integerValue]);
+
+	if (self.max)
+		maxFailed = [field length] > ((NSUInteger)[self.max integerValue]);
+
+	if (self.min && self.max && (minFailed || maxFailed)) {
+		if (anError) {
+			if ([self.min isEqual:self.max])
+				*anError = CreateError(0, @"must be exactly %@ characters", self.min);
+			else
+				*anError = CreateError(0, @"must be %@ to %@ characters", self.min, self.max);
+		}
+		return NO;
+	}
+
+	if (minFailed) {
+		if (anError)
+			*anError = CreateError(0, @"must be at least %@ characters", self.min);
+		return NO;
+	}
+
+	if (maxFailed) {
+		if (anError)
+			*anError = CreateError(0, @"must be at most %@ characters", self.max);
+		return NO;
+	}
 	return YES;
 }
 
