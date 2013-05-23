@@ -21,4 +21,14 @@
 	STAssertEqualObjects([error localizedDescription], @"must be an array", nil);
 }
 
+- (void)testPrototype {
+	STAssertTrue([[[FieldValidator array] of:[FieldValidator number]] isPleasedWith:(@[@1,@1,@2,@3]) error:nil], nil);
+}
+
+- (void)testPrototypeError {
+	NSError *error = nil;
+	STAssertFalse([[[FieldValidator array] of:[FieldValidator number]] isPleasedWith:(@[@1,@1,@"x",@3]) error:&error], nil);
+	STAssertEqualObjects([error localizedDescription], @"parameter 3 must be a number", nil);
+}
+
 @end

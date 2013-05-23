@@ -39,6 +39,7 @@
 @end
 
 @interface ArrayFieldValidator : FieldValidator
+@property (strong) FieldValidator *prototype;
 - (instancetype)of:(FieldValidator *)prototype;
 @end
 

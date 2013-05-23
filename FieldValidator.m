@@ -195,12 +195,27 @@
 
 @implementation ArrayFieldValidator
 
+- (instancetype)of:(FieldValidator *)prototype {
+	self.prototype = prototype;
+	return self;
+}
+
 - (BOOL)isPleasedWith:(id)field error:(NSError **)anError {
 	if (![field isKindOfClass:[NSArray class]]) {
 		if (anError) *anError = CreateError(0, @"must be an array");
 		return NO;
 	}
 
+	for (NSUInteger i=0; i<[field count]; i++) {
+		id item = field[i];
+		NSError *fieldError = nil;
+		if ([self.prototype isPleasedWith:item error:&fieldError]) continue;
+		if (anError)
+			*anError = CreateError(0, @"parameter %lu %@", i+1, [fieldError localizedDescription]);
+		return NO;
+	}
+
 	return YES;
 }
+
 @end
