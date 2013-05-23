@@ -3,9 +3,22 @@
 
 @implementation DictionaryValidatorTest
 
-- (void)testAlwaysPleased {
-	STAssertTrue([[DictionaryValidator validator] isPleasedWith:nil error:nil], nil);
-	STAssertTrue([[DictionaryValidator validator] isPleasedWith:@{} error:nil], nil);
+- (void)testInstance {
+	STAssertEqualObjects([[DictionaryValidator validator] class], [DictionaryValidator class], nil);
+}
+
+- (void)testConvenienceInstance {
+	STAssertEqualObjects([[ParameterValidator dictionary] class], [DictionaryValidator class], nil);
+}
+
+- (void)testPleasedWithDictionary {
+	STAssertTrue([[ParameterValidator dictionary] isPleasedWith:@{} error:nil], nil);
+}
+
+- (void)testNotPleasedWithNonDictionary {
+	NSError *error = nil;
+	STAssertFalse([[ParameterValidator dictionary] isPleasedWith:@2 error:&error], nil);
+	STAssertEqualObjects([error localizedDescription], @"must be a dictionary", nil);
 }
 
 - (void)testMandatoryPresent {

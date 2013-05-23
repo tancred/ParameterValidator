@@ -42,6 +42,10 @@
 	return [ArrayValidator validator];
 }
 
++ (DictionaryValidator *)dictionary {
+	return [DictionaryValidator validator];
+}
+
 @end
 
 
@@ -242,7 +246,12 @@
 	[self.validators addObject:@{@"param":name, @"validator":validator}];
 }
 
-- (BOOL)isPleasedWith:(NSDictionary *)parameters error:(NSError **)anError {
+- (BOOL)isPleasedWith:(id)param error:(NSError **)anError {
+	if (![param isKindOfClass:[NSDictionary class]]) {
+		if (anError) *anError = CreateError(0, @"must be a dictionary");
+		return NO;
+	}
+
 	NSMutableSet *processedParameters = [NSMutableSet set];
 
 	for (NSDictionary *each in self.validators) {
@@ -251,7 +260,7 @@
 
 		[processedParameters addObject:paramName];
 
-		NSString *paramValue = parameters[paramName];
+		NSString *paramValue = param[paramName];
 		if (!paramValue) {
 			if (paramValidator.isOptional) continue;
 			if (anError)
@@ -268,7 +277,7 @@
 	}
 
 	if (!self.allowsExtraParameters) {
-		NSMutableSet *superflousParameters = [NSMutableSet setWithArray:[parameters allKeys]];
+		NSMutableSet *superflousParameters = [NSMutableSet setWithArray:[param allKeys]];
 		[superflousParameters minusSet:processedParameters];
 		if ([superflousParameters count]) {
 			if (anError)
