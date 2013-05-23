@@ -1,4 +1,4 @@
 #import <SenTestingKit/SenTestingKit.h>
 
-@interface FieldValidatorTest : SenTestCase
+@interface ArrayValidatorTest : SenTestCase
 @end

@@ -1,5 +1,5 @@
 #import "DictionaryValidator.h"
-#import "FieldValidator.h"
+#import "ParameterValidator.h"
 #import "Error.h"
 
 @interface DictionaryValidator ()
@@ -20,30 +20,30 @@
 }
 
 - (void)validate:(NSString *)name with:(id)validator {
-	[self.validators addObject:@{@"field":name, @"validator":validator}];
+	[self.validators addObject:@{@"param":name, @"validator":validator}];
 }
 
 - (BOOL)isPleasedWith:(NSDictionary *)parameters error:(NSError **)anError {
 	NSMutableSet *processedParameters = [NSMutableSet set];
 
 	for (NSDictionary *each in self.validators) {
-		NSString *fieldName = each[@"field"];
-		FieldValidator *fieldValidator = each[@"validator"];
+		NSString *paramName = each[@"param"];
+		ParameterValidator *paramValidator = each[@"validator"];
 
-		[processedParameters addObject:fieldName];
+		[processedParameters addObject:paramName];
 
-		NSString *fieldValue = parameters[fieldName];
-		if (!fieldValue) {
-			if (fieldValidator.isOptional) continue;
+		NSString *paramValue = parameters[paramName];
+		if (!paramValue) {
+			if (paramValidator.isOptional) continue;
 			if (anError)
-				*anError = CreateError(0, @"missing required parameter '%@'", fieldName);
+				*anError = CreateError(0, @"missing required parameter '%@'", paramName);
 			return NO;
 		}
 
-		NSError *fieldError = nil;
-		if (![fieldValidator isPleasedWith:fieldValue error:&fieldError]) {
+		NSError *paramError = nil;
+		if (![paramValidator isPleasedWith:paramValue error:&paramError]) {
 			if (anError)
-				*anError = CreateError(0, @"parameter '%@' %@", fieldName, [fieldError localizedDescription]);
+				*anError = CreateError(0, @"parameter '%@' %@", paramName, [paramError localizedDescription]);
 			return NO;
 		}
 	}

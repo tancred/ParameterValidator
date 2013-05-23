@@ -1,52 +1,52 @@
-#import "StringFieldValidatorTest.h"
-#import "FieldValidator.h"
+#import "StringValidatorTest.h"
+#import "ParameterValidator.h"
 
-@implementation StringFieldValidatorTest
+@implementation StringValidatorTest
 
 - (void)testInstance {
-	STAssertEqualObjects([[StringFieldValidator validator] class], [StringFieldValidator class], nil);
+	STAssertEqualObjects([[StringValidator validator] class], [StringValidator class], nil);
 }
 
 - (void)testConvenienceInstance {
-	STAssertEqualObjects([[FieldValidator string] class], [StringFieldValidator class], nil);
+	STAssertEqualObjects([[ParameterValidator string] class], [StringValidator class], nil);
 }
 
 - (void)testPleasedWithString {
-	STAssertTrue([[FieldValidator string] isPleasedWith:@"two" error:nil], nil);
+	STAssertTrue([[ParameterValidator string] isPleasedWith:@"two" error:nil], nil);
 }
 
 - (void)testNotPleasedWithNonString {
 	NSError *error = nil;
-	STAssertFalse([[FieldValidator string] isPleasedWith:@2 error:&error], nil);
+	STAssertFalse([[ParameterValidator string] isPleasedWith:@2 error:&error], nil);
 	STAssertEqualObjects([error localizedDescription], @"must be a string", nil);
 }
 
 - (void)testMinLength {
-	STAssertTrue([[[FieldValidator string] min:@3] isPleasedWith:@"two" error:nil], nil);
+	STAssertTrue([[[ParameterValidator string] min:@3] isPleasedWith:@"two" error:nil], nil);
 }
 
 - (void)testMinLengthError {
 	NSError *error = nil;
-	STAssertFalse([[[FieldValidator string] min:@3] isPleasedWith:@"to" error:&error], nil);
+	STAssertFalse([[[ParameterValidator string] min:@3] isPleasedWith:@"to" error:&error], nil);
 	STAssertEqualObjects([error localizedDescription], @"must be at least 3 characters", nil);
 }
 
 - (void)testMaxLength {
-	STAssertTrue([[[FieldValidator string] max:@3] isPleasedWith:@"two" error:nil], nil);
+	STAssertTrue([[[ParameterValidator string] max:@3] isPleasedWith:@"two" error:nil], nil);
 }
 
 - (void)testMaxLengthError {
 	NSError *error = nil;
-	STAssertFalse([[[FieldValidator string] max:@3] isPleasedWith:@"three" error:&error], nil);
+	STAssertFalse([[[ParameterValidator string] max:@3] isPleasedWith:@"three" error:&error], nil);
 	STAssertEqualObjects([error localizedDescription], @"must be at most 3 characters", nil);
 }
 
 - (void)testMinAndMax {
-	STAssertTrue([[[[FieldValidator string] min:@3] max:@5] isPleasedWith:@"two" error:nil], nil);
+	STAssertTrue([[[[ParameterValidator string] min:@3] max:@5] isPleasedWith:@"two" error:nil], nil);
 }
 
 - (void)testMinAndMaxError {
-	FieldValidator *validator = [[[FieldValidator string] min:@3] max:@5];
+	ParameterValidator *validator = [[[ParameterValidator string] min:@3] max:@5];
 	NSError *error = nil;
 
 	STAssertFalse([validator isPleasedWith:@"to" error:&error], nil);
@@ -58,16 +58,16 @@
 
 - (void)testSameMinMax {
 	NSError *error = nil;
-	STAssertFalse([[[[FieldValidator string] min:@3] max:@3] isPleasedWith:@"three" error:&error], nil);
+	STAssertFalse([[[[ParameterValidator string] min:@3] max:@3] isPleasedWith:@"three" error:&error], nil);
 	STAssertEqualObjects([error localizedDescription], @"must be exactly 3 characters", nil);
 }
 
 - (void)testLength {
-	STAssertTrue([[[FieldValidator string] length:@3] isPleasedWith:@"two" error:nil], nil);
+	STAssertTrue([[[ParameterValidator string] length:@3] isPleasedWith:@"two" error:nil], nil);
 }
 
 - (void)testLengthErrorSameAsMinMax {
-	FieldValidator *validator = [[FieldValidator string] length:@3];
+	ParameterValidator *validator = [[ParameterValidator string] length:@3];
 	NSError *error = nil;
 
 	STAssertFalse([validator isPleasedWith:@"to" error:&error], nil);

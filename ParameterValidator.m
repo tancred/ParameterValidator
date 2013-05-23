@@ -1,7 +1,7 @@
-#import "FieldValidator.h"
+#import "ParameterValidator.h"
 #import "Error.h"
 
-@implementation FieldValidator
+@implementation ParameterValidator
 
 + (instancetype)validator {
 	return [[self alloc] init];
@@ -24,28 +24,28 @@
 @end
 
 
-@implementation FieldValidator (ConstructionConvenience)
+@implementation ParameterValidator (ConstructionConvenience)
 
-+ (NumberFieldValidator *)number {
-	return [NumberFieldValidator validator];
++ (NumberValidator *)number {
+	return [NumberValidator validator];
 }
 
-+ (StringFieldValidator *)string {
-	return [StringFieldValidator validator];
++ (StringValidator *)string {
+	return [StringValidator validator];
 }
 
-+ (HexstringFieldValidator *)hexstring {
-	return [HexstringFieldValidator validator];
++ (HexstringValidator *)hexstring {
+	return [HexstringValidator validator];
 }
 
-+ (ArrayFieldValidator *)array {
-	return [ArrayFieldValidator validator];
++ (ArrayValidator *)array {
+	return [ArrayValidator validator];
 }
 
 @end
 
 
-@implementation NumberFieldValidator
+@implementation NumberValidator
 
 - (instancetype)atMost:(NSNumber *)limit {
 	self.high = limit;
@@ -114,7 +114,7 @@
 @end
 
 
-@implementation StringFieldValidator
+@implementation StringValidator
 
 - (instancetype)length:(NSNumber *)limit {
 	[self min:limit];
@@ -174,7 +174,7 @@
 @end
 
 
-@implementation HexstringFieldValidator
+@implementation HexstringValidator
 
 - (BOOL)isPleasedWith:(id)field error:(NSError **)anError {
 	if (![super isPleasedWith:field error:anError]) return NO;
@@ -193,9 +193,9 @@
 @end
 
 
-@implementation ArrayFieldValidator
+@implementation ArrayValidator
 
-- (instancetype)of:(FieldValidator *)prototype {
+- (instancetype)of:(ParameterValidator *)prototype {
 	self.prototype = prototype;
 	return self;
 }

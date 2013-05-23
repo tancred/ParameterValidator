@@ -1,7 +1,7 @@
 #import <Foundation/Foundation.h>
 
-@interface FieldValidator : NSObject
-@property BOOL isOptional; // used by DictionaryValidator, not selfs -isPleasedWith:error:
+@interface ParameterValidator : NSObject
+@property BOOL isOptional; // used by DictionaryValidator.
 
 + (instancetype)validator;
 - (BOOL)isPleasedWith:(id)field error:(NSError **)anError;
@@ -10,7 +10,7 @@
 - (instancetype)optional;
 @end
 
-@interface NumberFieldValidator : FieldValidator
+@interface NumberValidator : ParameterValidator
 @property (copy) NSNumber *low;
 @property (copy) NSNumber *high;
 @property (assign) BOOL lowInclusive;
@@ -23,7 +23,7 @@
 - (instancetype)greaterThan:(NSNumber *)limit;
 @end
 
-@interface StringFieldValidator : FieldValidator
+@interface StringValidator : ParameterValidator
 @property (copy) NSNumber *min;
 @property (copy) NSNumber *max;
 - (instancetype)length:(NSNumber *)limit; // min == max
@@ -31,24 +31,21 @@
 - (instancetype)max:(NSNumber *)limit;
 @end
 
-@interface HexstringFieldValidator : StringFieldValidator
+@interface HexstringValidator : StringValidator
 // note: add a "limit to chars in set" option to the string validator. Then the convenience constructor -hexstring could simple sets the charset. Unless we want something like the following:
 //- (instancetype)bits:(NSUInteger)limit; // minBits == maxBits
 //- (instancetype)minBits:(NSUInteger)limit;
 //- (instancetype)maxBits:(NSUInteger)limit;
 @end
 
-@interface ArrayFieldValidator : FieldValidator
-@property (strong) FieldValidator *prototype;
-- (instancetype)of:(FieldValidator *)prototype;
+@interface ArrayValidator : ParameterValidator
+@property (strong) ParameterValidator *prototype;
+- (instancetype)of:(ParameterValidator *)prototype;
 @end
 
-@interface PredicateFieldValidator : NSObject
-@end
-
-@interface FieldValidator (ConstructionConvenience)
-+ (NumberFieldValidator *)number;
-+ (StringFieldValidator *)string;
-+ (HexstringFieldValidator *)hexstring;
-+ (ArrayFieldValidator *)array;
+@interface ParameterValidator (ConstructionConvenience)
++ (NumberValidator *)number;
++ (StringValidator *)string;
++ (HexstringValidator *)hexstring;
++ (ArrayValidator *)array;
 @end

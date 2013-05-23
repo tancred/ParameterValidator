@@ -1,31 +1,31 @@
-#import "HexstringFieldValidatorTest.h"
-#import "FieldValidator.h"
+#import "HexstringValidatorTest.h"
+#import "ParameterValidator.h"
 
-@implementation HexstringFieldValidatorTest
+@implementation HexstringValidatorTest
 
 - (void)testInstance {
-	STAssertEqualObjects([[HexstringFieldValidator validator] class], [HexstringFieldValidator class], nil);
+	STAssertEqualObjects([[HexstringValidator validator] class], [HexstringValidator class], nil);
 }
 
 - (void)testConvenienceInstance {
-	STAssertEqualObjects([[FieldValidator hexstring] class], [HexstringFieldValidator class], nil);
+	STAssertEqualObjects([[ParameterValidator hexstring] class], [HexstringValidator class], nil);
 }
 
 - (void)testPleasedWithHexstring {
-	STAssertTrue([[FieldValidator hexstring] isPleasedWith:@"abcdefABCDEF0123456789" error:nil], nil);
+	STAssertTrue([[ParameterValidator hexstring] isPleasedWith:@"abcdefABCDEF0123456789" error:nil], nil);
 }
 
 - (void)testPerformsStringValidationsBeforeSpecificHexValidations {
 	NSError *error = nil;
-	STAssertFalse([[FieldValidator hexstring] isPleasedWith:@2 error:&error], nil);
+	STAssertFalse([[ParameterValidator hexstring] isPleasedWith:@2 error:&error], nil);
 	STAssertEqualObjects([error localizedDescription], @"must be a string", nil);
 
 	error = nil;
-	STAssertFalse([[[FieldValidator hexstring] min:@3] isPleasedWith:@"to" error:&error], nil);
+	STAssertFalse([[[ParameterValidator hexstring] min:@3] isPleasedWith:@"to" error:&error], nil);
 	STAssertEqualObjects([error localizedDescription], @"must be at least 3 characters", nil);
 
 	error = nil;
-	STAssertFalse([[[FieldValidator hexstring] length:@3] isPleasedWith:@"to" error:&error], nil);
+	STAssertFalse([[[ParameterValidator hexstring] length:@3] isPleasedWith:@"to" error:&error], nil);
 	STAssertEqualObjects([error localizedDescription], @"must be exactly 3 characters", nil);
 }
 
@@ -37,15 +37,15 @@
 	// thorough test can be performed on the algorithm instead of the data, but let's not
 	// over-work this.
 	NSError *error = nil;
-	STAssertFalse([[FieldValidator hexstring] isPleasedWith:@"a b" error:&error], nil);
+	STAssertFalse([[ParameterValidator hexstring] isPleasedWith:@"a b" error:&error], nil);
 	STAssertEqualObjects([error localizedDescription], @"must be a hexstring", nil);
 
 	error = nil;
-	STAssertFalse([[FieldValidator hexstring] isPleasedWith:@" ab" error:&error], nil);
+	STAssertFalse([[ParameterValidator hexstring] isPleasedWith:@" ab" error:&error], nil);
 	STAssertEqualObjects([error localizedDescription], @"must be a hexstring", nil);
 
 	error = nil;
-	STAssertFalse([[FieldValidator hexstring] isPleasedWith:@"ab " error:&error], nil);
+	STAssertFalse([[ParameterValidator hexstring] isPleasedWith:@"ab " error:&error], nil);
 	STAssertEqualObjects([error localizedDescription], @"must be a hexstring", nil);
 }
 
