@@ -85,4 +85,14 @@
 	STAssertTrue([validator isPleasedWith:(@{@"param1":@3, @"param2":@"str", @"param3":@2}) error:nil], nil);
 }
 
+- (void)testNested {
+	DictionaryValidator *validator = [DictionaryValidator validator];
+	[validator validate:@"param1" with:[[ParameterValidator dictionary] optional]];
+	[validator validate:@"param2" with:[ParameterValidator dictionary]];
+
+	NSError *error = nil;
+	STAssertFalse([validator isPleasedWith:(@{@"param2":@2}) error:&error], nil);
+	STAssertEqualObjects([error localizedDescription], @"parameter 'param2' must be a dictionary", nil);
+}
+
 @end
