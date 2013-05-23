@@ -39,7 +39,7 @@
 }
 
 + (ArrayFieldValidator *)array {
-	return nil;
+	return [ArrayFieldValidator validator];
 }
 
 @end
@@ -190,4 +190,17 @@
 	return YES;
 }
 
+@end
+
+
+@implementation ArrayFieldValidator
+
+- (BOOL)isPleasedWith:(id)field error:(NSError **)anError {
+	if (![field isKindOfClass:[NSArray class]]) {
+		if (anError) *anError = CreateError(0, @"must be an array");
+		return NO;
+	}
+
+	return YES;
+}
 @end
