@@ -43,6 +43,14 @@
 - (instancetype)of:(ParameterValidator *)prototype;
 @end
 
+@interface DictionaryValidator : NSObject
+@property BOOL allowsExtraParameters;
++ (instancetype)validator;
+- (void)validate:(NSString *)name with:(id)validator;
+- (BOOL)isPleasedWith:(NSDictionary *)parameters error:(NSError **)anError;
+	// Allow multiple validators for a parameter? Allow contradictions?
+@end
+
 @interface ParameterValidator (ConstructionConvenience)
 + (NumberValidator *)number;
 + (StringValidator *)string;

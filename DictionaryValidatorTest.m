@@ -1,5 +1,4 @@
 #import "DictionaryValidatorTest.h"
-#import "DictionaryValidator.h"
 #import "ParameterValidator.h"
 
 @implementation DictionaryValidatorTest
