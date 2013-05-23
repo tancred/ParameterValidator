@@ -32,6 +32,7 @@
 @end
 
 @interface HexstringFieldValidator : StringFieldValidator
+// note: add a "limit to chars in set" option to the string validator. Then the convenience constructor -hexstring could simple sets the charset. Unless we want something like the following:
 //- (instancetype)bits:(NSUInteger)limit; // minBits == maxBits
 //- (instancetype)minBits:(NSUInteger)limit;
 //- (instancetype)maxBits:(NSUInteger)limit;
