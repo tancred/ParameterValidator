@@ -35,7 +35,7 @@
 }
 
 + (HexstringFieldValidator *)hexstring {
-	return nil;
+	return [HexstringFieldValidator validator];
 }
 
 + (ArrayFieldValidator *)array {
@@ -168,6 +168,25 @@
 			*anError = CreateError(0, @"must be at most %@ characters", self.max);
 		return NO;
 	}
+	return YES;
+}
+
+@end
+
+
+@implementation HexstringFieldValidator
+
+- (BOOL)isPleasedWith:(id)field error:(NSError **)anError {
+	if (![super isPleasedWith:field error:anError]) return NO;
+
+	NSCharacterSet *hexChars = [NSCharacterSet characterSetWithCharactersInString:@"0123456789abcdefABCDEF"];
+	for (NSUInteger i=0; i<[field length]; i++) {
+		if ([hexChars characterIsMember:[field characterAtIndex:i]]) continue;
+		if (anError)
+			*anError = CreateError(0, @"must be a hexstring");
+		return NO;
+	}
+
 	return YES;
 }
 

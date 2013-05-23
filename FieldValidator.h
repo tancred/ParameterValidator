@@ -32,9 +32,9 @@
 @end
 
 @interface HexstringFieldValidator : StringFieldValidator
-- (instancetype)bits:(NSUInteger)limit; // minBits == maxBits
-- (instancetype)minBits:(NSUInteger)limit;
-- (instancetype)maxBits:(NSUInteger)limit;
+//- (instancetype)bits:(NSUInteger)limit; // minBits == maxBits
+//- (instancetype)minBits:(NSUInteger)limit;
+//- (instancetype)maxBits:(NSUInteger)limit;
 @end
 
 @interface ArrayFieldValidator : FieldValidator
