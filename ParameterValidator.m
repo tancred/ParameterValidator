@@ -242,6 +242,16 @@
 	return self;
 }
 
+- (instancetype)merciless {
+	self.allowsExtraParameters = NO;
+	return self;
+}
+
+- (instancetype)merciful {
+	self.allowsExtraParameters = YES;
+	return self;
+}
+
 - (void)validate:(NSString *)name with:(id)validator {
 	[self.validators addObject:@{@"param":name, @"validator":validator}];
 }

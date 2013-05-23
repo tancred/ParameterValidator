@@ -48,6 +48,9 @@
 @property BOOL allowsExtraParameters;
 + (instancetype)validator;
 - (void)validate:(NSString *)name with:(id)validator;
+
+- (instancetype)merciless;
+- (instancetype)merciful;
 @end
 
 @interface ParameterValidator (ConstructionConvenience)

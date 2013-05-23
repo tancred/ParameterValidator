@@ -74,14 +74,15 @@
 }
 
 - (void)testNotPleasedWithExtraParameters {
+	DictionaryValidator *validator = [[DictionaryValidator validator] merciless];
+
 	NSError *error = nil;
-	STAssertFalse([[DictionaryValidator validator] isPleasedWith:(@{@"param1":@3, @"param2":@"str", @"param3":@2}) error:&error], nil);
+	STAssertFalse([validator isPleasedWith:(@{@"param1":@3, @"param2":@"str", @"param3":@2}) error:&error], nil);
 	STAssertEqualObjects([error localizedDescription], @"superflous parameters param1, param2, param3", nil);
 }
 
 - (void)testPleasedWithExtraParameters {
-	DictionaryValidator *validator = [DictionaryValidator validator];
-	validator.allowsExtraParameters = YES;
+	DictionaryValidator *validator = [[DictionaryValidator validator] merciful];
 	STAssertTrue([validator isPleasedWith:(@{@"param1":@3, @"param2":@"str", @"param3":@2}) error:nil], nil);
 }
 
