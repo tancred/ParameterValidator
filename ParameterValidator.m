@@ -252,8 +252,9 @@
 	return self;
 }
 
-- (void)validate:(NSString *)name with:(id)validator {
+- (instancetype)validate:(NSString *)name with:(id)validator {
 	[self.validators addObject:@{@"param":name, @"validator":validator}];
+	return self;
 }
 
 - (BOOL)isPleasedWith:(id)param error:(NSError **)anError {

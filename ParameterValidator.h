@@ -44,13 +44,12 @@
 @end
 
 @interface DictionaryValidator : ParameterValidator
-// Allow multiple validators for a parameter? Allow contradictions?
 @property BOOL allowsExtraParameters;
-+ (instancetype)validator;
-- (void)validate:(NSString *)name with:(id)validator;
 
 - (instancetype)merciless;
 - (instancetype)merciful;
+
+- (instancetype)validate:(NSString *)name with:(id)validator;
 @end
 
 @interface ParameterValidator (ConstructionConvenience)

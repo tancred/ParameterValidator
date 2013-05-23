@@ -87,9 +87,9 @@
 }
 
 - (void)testNested {
-	DictionaryValidator *validator = [DictionaryValidator validator];
-	[validator validate:@"param1" with:[[ParameterValidator dictionary] optional]];
-	[validator validate:@"param2" with:[ParameterValidator dictionary]];
+	DictionaryValidator *validator = [[ [DictionaryValidator validator]
+		validate:@"param1" with:[[ParameterValidator dictionary] optional] ]
+		validate:@"param2" with:[ParameterValidator dictionary] ];
 
 	NSError *error = nil;
 	STAssertFalse([validator isPleasedWith:(@{@"param2":@2}) error:&error], nil);
