@@ -5,5 +5,5 @@
 + (instancetype)validator;
 - (void)validate:(NSString *)name with:(id)validator;
 - (BOOL)isPleasedWith:(NSDictionary *)parameters error:(NSError **)anError;
-	// Allow multiple validators for a field? Allow contradictions?
+	// Allow multiple validators for a parameter? Allow contradictions?
 @end

@@ -7,7 +7,7 @@
 	return [[self alloc] init];
 }
 
-- (BOOL)isPleasedWith:(id)field error:(NSError **)anError {
+- (BOOL)isPleasedWith:(id)param error:(NSError **)anError {
 	return YES;
 }
 
@@ -71,8 +71,8 @@
 	return self;
 }
 
-- (BOOL)isPleasedWith:(id)field error:(NSError **)anError {
-	if (![field isKindOfClass:[NSNumber class]]) {
+- (BOOL)isPleasedWith:(id)param error:(NSError **)anError {
+	if (![param isKindOfClass:[NSNumber class]]) {
 		if (anError) *anError = CreateError(0, @"must be a number");
 		return NO;
 	}
@@ -81,13 +81,13 @@
 	BOOL highFailed = NO;
 
 	if (self.low) {
-		NSComparisonResult r = [field compare:self.low];
+		NSComparisonResult r = [param compare:self.low];
 		if (!self.lowInclusive && r != NSOrderedDescending) lowFailed = YES;
 		else if (self.lowInclusive && r == NSOrderedAscending) lowFailed = YES;
 	}
 
 	if (self.high) {
-		NSComparisonResult r = [field compare:self.high];
+		NSComparisonResult r = [param compare:self.high];
 		if (!self.highInclusive && r != NSOrderedAscending) highFailed = YES;
 		else if (self.highInclusive && r == NSOrderedDescending) highFailed = YES;
 	}
@@ -132,8 +132,8 @@
 	return self;
 }
 
-- (BOOL)isPleasedWith:(id)field error:(NSError **)anError {
-	if (![field isKindOfClass:[NSString class]]) {
+- (BOOL)isPleasedWith:(id)param error:(NSError **)anError {
+	if (![param isKindOfClass:[NSString class]]) {
 		if (anError) *anError = CreateError(0, @"must be a string");
 		return NO;
 	}
@@ -142,10 +142,10 @@
 	BOOL maxFailed = NO;
 
 	if (self.min)
-		minFailed = [field length] < ((NSUInteger)[self.min integerValue]);
+		minFailed = [param length] < ((NSUInteger)[self.min integerValue]);
 
 	if (self.max)
-		maxFailed = [field length] > ((NSUInteger)[self.max integerValue]);
+		maxFailed = [param length] > ((NSUInteger)[self.max integerValue]);
 
 	if (self.min && self.max && (minFailed || maxFailed)) {
 		if (anError) {
@@ -176,12 +176,12 @@
 
 @implementation HexstringValidator
 
-- (BOOL)isPleasedWith:(id)field error:(NSError **)anError {
-	if (![super isPleasedWith:field error:anError]) return NO;
+- (BOOL)isPleasedWith:(id)param error:(NSError **)anError {
+	if (![super isPleasedWith:param error:anError]) return NO;
 
 	NSCharacterSet *hexChars = [NSCharacterSet characterSetWithCharactersInString:@"0123456789abcdefABCDEF"];
-	for (NSUInteger i=0; i<[field length]; i++) {
-		if ([hexChars characterIsMember:[field characterAtIndex:i]]) continue;
+	for (NSUInteger i=0; i<[param length]; i++) {
+		if ([hexChars characterIsMember:[param characterAtIndex:i]]) continue;
 		if (anError)
 			*anError = CreateError(0, @"must be a hexstring");
 		return NO;
@@ -200,18 +200,18 @@
 	return self;
 }
 
-- (BOOL)isPleasedWith:(id)field error:(NSError **)anError {
-	if (![field isKindOfClass:[NSArray class]]) {
+- (BOOL)isPleasedWith:(id)param error:(NSError **)anError {
+	if (![param isKindOfClass:[NSArray class]]) {
 		if (anError) *anError = CreateError(0, @"must be an array");
 		return NO;
 	}
 
-	for (NSUInteger i=0; i<[field count]; i++) {
-		id item = field[i];
-		NSError *fieldError = nil;
-		if ([self.prototype isPleasedWith:item error:&fieldError]) continue;
+	for (NSUInteger i=0; i<[param count]; i++) {
+		id item = param[i];
+		NSError *paramError = nil;
+		if ([self.prototype isPleasedWith:item error:&paramError]) continue;
 		if (anError)
-			*anError = CreateError(0, @"parameter %lu %@", i+1, [fieldError localizedDescription]);
+			*anError = CreateError(0, @"parameter %lu %@", i+1, [paramError localizedDescription]);
 		return NO;
 	}
 

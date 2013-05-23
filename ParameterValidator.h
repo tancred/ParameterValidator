@@ -4,7 +4,7 @@
 @property BOOL isOptional; // used by DictionaryValidator.
 
 + (instancetype)validator;
-- (BOOL)isPleasedWith:(id)field error:(NSError **)anError;
+- (BOOL)isPleasedWith:(id)param error:(NSError **)anError;
 
 - (instancetype)mandatory;
 - (instancetype)optional;
