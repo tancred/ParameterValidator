@@ -1,6 +1,6 @@
 #import <Foundation/Foundation.h>
 
-@interface ParameterValidator : NSObject
+@interface DictionaryValidator : NSObject
 @property BOOL allowsExtraParameters;
 + (instancetype)validator;
 - (void)validate:(NSString *)name with:(id)validator;

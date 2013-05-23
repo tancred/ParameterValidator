@@ -1,22 +1,22 @@
-#import "ParameterValidatorTest.h"
-#import "ParameterValidator.h"
+#import "DictionaryValidatorTest.h"
+#import "DictionaryValidator.h"
 #import "FieldValidator.h"
 
-@implementation ParameterValidatorTest
+@implementation DictionaryValidatorTest
 
 - (void)testAlwaysPleased {
-	STAssertTrue([[ParameterValidator validator] isPleasedWith:nil error:nil], nil);
-	STAssertTrue([[ParameterValidator validator] isPleasedWith:@{} error:nil], nil);
+	STAssertTrue([[DictionaryValidator validator] isPleasedWith:nil error:nil], nil);
+	STAssertTrue([[DictionaryValidator validator] isPleasedWith:@{} error:nil], nil);
 }
 
 - (void)testMandatoryPresent {
-	ParameterValidator *validator = [ParameterValidator validator];
+	DictionaryValidator *validator = [DictionaryValidator validator];
 	[validator validate:@"field" with:[FieldValidator validator]];
 	STAssertTrue([validator isPleasedWith:@{@"field":@"something"} error:nil], nil);
 }
 
 - (void)testMandatoryMissing {
-	ParameterValidator *validator = [ParameterValidator validator];
+	DictionaryValidator *validator = [DictionaryValidator validator];
 	[validator validate:@"field" with:[FieldValidator validator]];
 
 	NSError *error = nil;
@@ -25,25 +25,25 @@
 }
 
 - (void)testOptionalPresent {
-	ParameterValidator *validator = [ParameterValidator validator];
+	DictionaryValidator *validator = [DictionaryValidator validator];
 	[validator validate:@"field" with:[[FieldValidator validator] optional]];
 	STAssertTrue([validator isPleasedWith:@{@"field":@"something"} error:nil], nil);
 }
 
 - (void)testOptionalMissing {
-	ParameterValidator *validator = [ParameterValidator validator];
+	DictionaryValidator *validator = [DictionaryValidator validator];
 	[validator validate:@"field" with:[[FieldValidator validator] optional]];
 	STAssertTrue([validator isPleasedWith:@{} error:nil], nil);
 }
 
 - (void)testPleasedWithField {
-	ParameterValidator *validator = [ParameterValidator validator];
+	DictionaryValidator *validator = [DictionaryValidator validator];
 	[validator validate:@"field" with:[[FieldValidator number] lessThan:@4]];
 	STAssertTrue([validator isPleasedWith:@{@"field":@3} error:nil], nil);
 }
 
 - (void)testNotPleasedWithField {
-	ParameterValidator *validator = [ParameterValidator validator];
+	DictionaryValidator *validator = [DictionaryValidator validator];
 	[validator validate:@"field" with:[[FieldValidator number] lessThan:@4]];
 
 	NSError *error = nil;
@@ -52,7 +52,7 @@
 }
 
 - (void)testFieldsValidatedInOrder {
-	ParameterValidator *validator = [ParameterValidator validator];
+	DictionaryValidator *validator = [DictionaryValidator validator];
 	[validator validate:@"field1" with:[[FieldValidator number] lessThan:@4]];
 	[validator validate:@"field2" with:[FieldValidator number]];
 
@@ -63,12 +63,12 @@
 
 - (void)testNotPleasedWithExtraParameters {
 	NSError *error = nil;
-	STAssertFalse([[ParameterValidator validator] isPleasedWith:(@{@"field1":@3, @"field2":@"str", @"field3":@2}) error:&error], nil);
+	STAssertFalse([[DictionaryValidator validator] isPleasedWith:(@{@"field1":@3, @"field2":@"str", @"field3":@2}) error:&error], nil);
 	STAssertEqualObjects([error localizedDescription], @"superflous parameters field1, field2, field3", nil);
 }
 
 - (void)testPleasedWithExtraParameters {
-	ParameterValidator *validator = [ParameterValidator validator];
+	DictionaryValidator *validator = [DictionaryValidator validator];
 	validator.allowsExtraParameters = YES;
 	STAssertTrue([validator isPleasedWith:(@{@"field1":@3, @"field2":@"str", @"field3":@2}) error:nil], nil);
 }

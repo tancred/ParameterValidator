@@ -1,7 +1,7 @@
 #import <Foundation/Foundation.h>
 
 @interface FieldValidator : NSObject
-@property BOOL isOptional; // used by ParameterValidator, not selfs -isPleasedWith:error:
+@property BOOL isOptional; // used by DictionaryValidator, not selfs -isPleasedWith:error:
 
 + (instancetype)validator;
 - (BOOL)isPleasedWith:(id)field error:(NSError **)anError;

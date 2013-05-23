@@ -1,13 +1,13 @@
-#import "ParameterValidator.h"
+#import "DictionaryValidator.h"
 #import "FieldValidator.h"
 #import "Error.h"
 
-@interface ParameterValidator ()
+@interface DictionaryValidator ()
 @property (strong) NSMutableArray *validators;
 @end
 
 
-@implementation ParameterValidator
+@implementation DictionaryValidator
 
 + (instancetype)validator {
 	return [[self alloc] init];
