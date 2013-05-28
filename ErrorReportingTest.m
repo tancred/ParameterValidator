@@ -120,4 +120,91 @@
 	STAssertEqualObjects(keys, (@[ @[@"p1", @"p2.1", @"p3.1"], @[@"p1", @"p2.1", @"p3.2"], @[@"p1", @"p2.2", @33], @[@"p1", @"p2.2", @34] ]), nil);
 }
 
+- (void)testKeysForNumberError {
+	NSError *error = nil;
+	[[ParameterValidator number] isPleasedWith:@"two" error:&error];
+	STAssertEqualObjects([ParameterValidator underlyingErrorKeys:error], @[], nil);
+}
+
+- (void)testKeysForDictionaryTypeError {
+	NSError *error = nil;
+	[[ParameterValidator dictionary] isPleasedWith:@"string" error:&error];
+	STAssertEqualObjects([ParameterValidator underlyingErrorKeys:error], @[], nil);
+}
+
+- (void)testKeysForArrayTypeError {
+	NSError *error = nil;
+	[[ParameterValidator array] isPleasedWith:@"string" error:&error];
+	STAssertEqualObjects([ParameterValidator underlyingErrorKeys:error], @[], nil);
+}
+
+- (void)testKeysForDictionaryParameterError {
+	DictionaryValidator *validator = [ParameterValidator dictionary];
+	[validator validate:@"param" with:[[ParameterValidator validator] mandatory]];
+
+	NSError *error = nil;
+	[validator isPleasedWith:@{} error:&error];
+	NSArray *keys = [ParameterValidator underlyingErrorKeys:error];
+
+	STAssertEqualObjects(keys, (@[ @[@"param"] ]), nil);
+}
+
+- (void)testKeysForMultipleDictionaryParameterErrors {
+	DictionaryValidator *validator = [ParameterValidator dictionary];
+	[validator validate:@"num" with:[ParameterValidator number]];
+	[validator validate:@"arr" with:[ParameterValidator array]];
+	[validator validate:@"str" with:[ParameterValidator string]];
+
+	NSError *error = nil;
+	[validator isPleasedWith:@{@"arr": @[]} error:&error];
+	NSArray *keys = [ParameterValidator underlyingErrorKeys:error];
+
+	STAssertEqualObjects(keys, (@[ @[@"num"], @[@"str"] ]), nil);
+}
+
+- (void)testKeysForArrayParameterError {
+	ArrayValidator *validator = [[ParameterValidator array] of:[ParameterValidator number]];
+
+	NSError *error = nil;
+	[validator isPleasedWith:@[@"string"] error:&error];
+	NSArray *keys = [ParameterValidator underlyingErrorKeys:error];
+
+	STAssertEqualObjects(keys, (@[ @[@0] ]), nil);
+}
+
+- (void)testKeysForMultipleArrayParameterErrors {
+	ArrayValidator *validator = [[ParameterValidator array] of:[ParameterValidator number]];
+
+	NSError *error = nil;
+	[validator isPleasedWith:@[@24, @"str1", @"str2", @25, @26] error:&error];
+	NSArray *keys = [ParameterValidator underlyingErrorKeys:error];
+
+	STAssertEqualObjects(keys, (@[ @[@1], @[@2] ]), nil);
+}
+
+- (void)testKeysForNestedDictionaryErrors {
+	id c = [ParameterValidator dictionary];
+	  [c validate:@"num" with:[ParameterValidator number]];
+	  [c validate:@"hex" with:[ParameterValidator hexstring]];
+	  [c validate:@"str" with:[ParameterValidator string]];
+	id b = [[ParameterValidator dictionary] validate:@"c" with:c];
+	id a = [[ParameterValidator dictionary] validate:@"b" with:b];
+
+	id dict = @{
+		@"b": @{
+			@"c": @{
+				@"num": @"not a num",
+				@"hex": @"beef",
+				@"str": @42
+			}
+		}
+	};
+
+	NSError *error = nil;
+	[a isPleasedWith:dict error:&error];
+	NSArray *keys = [ParameterValidator underlyingErrorKeys:error];
+
+	STAssertEqualObjects(keys, (@[ @[@"b",@"c",@"num"], @[@"b",@"c",@"str"] ]), nil);
+}
+
 @end
