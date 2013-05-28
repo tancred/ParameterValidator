@@ -301,3 +301,75 @@
 }
 
 @end
+
+
+@implementation ParameterValidator (ErrorReporting)
+
++ (NSArray *)underlyingErrorKeys:(NSError *)anError {
+	NSMutableArray *keys = [NSMutableArray array];
+	NSDictionary *underlyingErrors = [[anError userInfo] objectForKey:ParameterValidatorUnderlyingValidatorErrorsKey];
+
+	for (NSArray *eachError in underlyingErrors) {
+		id key = eachError[0];
+		id subKeys = [self underlyingErrorKeys:eachError[1]];
+
+		if ([subKeys count]) {
+			for (id subKey in subKeys) {
+				[keys addObject:[@[key] arrayByAddingObjectsFromArray:subKey]];
+			}
+		} else {
+			[keys addObject:@[key]];
+		}
+	}
+	return keys;
+}
+
++ (NSError *)leafError:(NSString *)fmt, ... {
+	va_list args;
+	va_start(args, fmt);
+	NSString *description = [[NSString alloc] initWithFormat:fmt arguments:args];
+	va_end(args);
+	return [NSError errorWithDomain:ParameterValidatorErrorDomain code:0 userInfo:@{NSLocalizedDescriptionKey: description}];
+}
+
++ (NSError *)leafErrorFromError:(NSError *)anError format:(NSString *)fmt, ... {
+	va_list args;
+	va_start(args, fmt);
+	NSString *description = [[NSString alloc] initWithFormat:fmt arguments:args];
+	va_end(args);
+
+	if (anError) {
+		description = [description stringByAppendingFormat:@" %@", [anError localizedDescription]];
+	}
+
+	id userInfo = @{
+		NSLocalizedDescriptionKey: description,
+		NSUnderlyingErrorKey: anError
+	};
+
+	return [NSError errorWithDomain:ParameterValidatorErrorDomain code:0 userInfo:userInfo];
+}
+
++ (NSError *)branchErrorForKeyedErrors:(NSArray *)errors {
+	NSString *description = @"validation error for multiple parameters";
+
+	if ([errors count] == 1) {
+		id firstKeyedError = errors[0];
+		description = [NSString stringWithFormat:@"validation error for parameter '%@': %@", firstKeyedError[0], [firstKeyedError[1] localizedDescription]];
+	}
+
+	id userInfo = @{
+		ParameterValidatorUnderlyingValidatorErrorsKey: errors,
+		NSLocalizedDescriptionKey: description
+	};
+	return [NSError errorWithDomain:ParameterValidatorErrorDomain code:1 userInfo:userInfo];
+}
+
+@end
+
+
+NSString *ParameterValidatorErrorDomain = @"com.tancred.parametervalidator";
+NSInteger ParameterValidatorErrorCodeLeaf = 0;
+NSInteger ParameterValidatorErrorCodeBranch = 1;
+
+NSString *ParameterValidatorUnderlyingValidatorErrorsKey = @"UnderlyingValidatorErrors";

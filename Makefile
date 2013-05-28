@@ -13,7 +13,8 @@ ParameterValidatorTest.o \
 NumberValidatorTest.o \
 StringValidatorTest.o \
 HexstringValidatorTest.o \
-ArrayValidatorTest.o
+ArrayValidatorTest.o \
+ErrorReportingTest.o
 	$(CC) -o $@ $(CFLAGS) $^ -framework Foundation -framework SenTestingKit
 
 validparams.o: validparams.m
@@ -26,6 +27,7 @@ NumberValidatorTest.o: NumberValidatorTest.m NumberValidatorTest.h ParameterVali
 StringValidatorTest.o: StringValidatorTest.m StringValidatorTest.h ParameterValidator.h
 HexstringValidatorTest.o: HexstringValidatorTest.m HexstringValidatorTest.h ParameterValidator.h
 ArrayValidatorTest.o: ArrayValidatorTest.m ArrayValidatorTest.h ParameterValidator.h
+ErrorReportingTest.o: ErrorReportingTest.m ErrorReportingTest.h ParameterValidator.h
 
 %.o: %.m
 	$(CC) -c $(CFLAGS) $<

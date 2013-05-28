@@ -59,3 +59,17 @@
 + (ArrayValidator *)array;
 + (DictionaryValidator *)dictionary;
 @end
+
+@interface ParameterValidator (ErrorReporting)
++ (NSArray *)underlyingErrorKeys:(NSError *)anError;
+
++ (NSError *)leafError:(NSString *)fmt, ... NS_FORMAT_FUNCTION(1, 2);
++ (NSError *)leafErrorFromError:(NSError *)anError format:(NSString *)fmt, ... NS_FORMAT_FUNCTION(2, 3);
++ (NSError *)branchErrorForKeyedErrors:(NSArray *)errors;
+@end
+
+extern NSString *ParameterValidatorErrorDomain;
+extern NSInteger ParameterValidatorErrorCodeLeaf;
+extern NSInteger ParameterValidatorErrorCodeBranch;
+
+extern NSString *ParameterValidatorUnderlyingValidatorErrorsKey;
