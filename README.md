@@ -2,19 +2,13 @@ ParameterValidator
 ==================
 
 ParameterValidator is a small Objective-C library
-	for validating the contents of a dictionary.
+	for validating the contents of a dictionary or an array.
 	Currently in prototyping phase.
 
 The Plan
 --------
 
-1. Rework error reporting?
-	_Maybe return a structure of errors
-	including type of error (mandatory/validation/superflous)
-	and field name.
-	Optionally report all errors instead of the first encountered._
-
-2. Write short, succinct API usage here.
+1. Write short, succinct API usage here.
 
 The API
 -------------------
