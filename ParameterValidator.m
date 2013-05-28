@@ -1,5 +1,4 @@
 #import "ParameterValidator.h"
-#import "Error.h"
 
 @implementation ParameterValidator
 
@@ -77,7 +76,7 @@
 
 - (BOOL)isPleasedWith:(id)param error:(NSError **)anError {
 	if (![param isKindOfClass:[NSNumber class]]) {
-		if (anError) *anError = CreateError(0, @"must be a number");
+		if (anError) *anError = [ParameterValidator leafError:@"must be a number"];
 		return NO;
 	}
 
@@ -98,17 +97,17 @@
 
 	if (self.low && self.high && (lowFailed || highFailed)) {
 		if (anError)
-			*anError = CreateError(0, @"must be in %@%@,%@%@", self.lowInclusive ? @"[" : @"(", self.low, self.high, self.highInclusive ? @"]" : @")");
+			*anError = [ParameterValidator leafError:@"must be in %@%@,%@%@", self.lowInclusive ? @"[" : @"(", self.low, self.high, self.highInclusive ? @"]" : @")"];
 		return NO;
 	}
 	if (lowFailed) {
 		if (anError)
-			*anError = CreateError(0, @"must be %@ %@", self.lowInclusive ? @"at least" : @"greater than", self.low);
+			*anError = [ParameterValidator leafError:@"must be %@ %@", self.lowInclusive ? @"at least" : @"greater than", self.low];
 		return NO;
 	}
 	if (highFailed) {
 		if (anError)
-			*anError = CreateError(0, @"must be %@ %@", self.highInclusive ? @"at most" : @"less than", self.high);
+			*anError = [ParameterValidator leafError:@"must be %@ %@", self.highInclusive ? @"at most" : @"less than", self.high];
 		return NO;
 	}
 
@@ -138,7 +137,7 @@
 
 - (BOOL)isPleasedWith:(id)param error:(NSError **)anError {
 	if (![param isKindOfClass:[NSString class]]) {
-		if (anError) *anError = CreateError(0, @"must be a string");
+		if (anError) *anError = [ParameterValidator leafError:@"must be a string"];
 		return NO;
 	}
 
@@ -154,22 +153,22 @@
 	if (self.min && self.max && (minFailed || maxFailed)) {
 		if (anError) {
 			if ([self.min isEqual:self.max])
-				*anError = CreateError(0, @"must be exactly %@ characters", self.min);
+				*anError = [ParameterValidator leafError:@"must be exactly %@ characters", self.min];
 			else
-				*anError = CreateError(0, @"must be %@ to %@ characters", self.min, self.max);
+				*anError = [ParameterValidator leafError:@"must be %@ to %@ characters", self.min, self.max];
 		}
 		return NO;
 	}
 
 	if (minFailed) {
 		if (anError)
-			*anError = CreateError(0, @"must be at least %@ characters", self.min);
+			*anError = [ParameterValidator leafError:@"must be at least %@ characters", self.min];
 		return NO;
 	}
 
 	if (maxFailed) {
 		if (anError)
-			*anError = CreateError(0, @"must be at most %@ characters", self.max);
+			*anError = [ParameterValidator leafError:@"must be at most %@ characters", self.max];
 		return NO;
 	}
 	return YES;
@@ -187,7 +186,7 @@
 	for (NSUInteger i=0; i<[param length]; i++) {
 		if ([hexChars characterIsMember:[param characterAtIndex:i]]) continue;
 		if (anError)
-			*anError = CreateError(0, @"must be a hexstring");
+			*anError = [ParameterValidator leafError:@"must be a hexstring"];
 		return NO;
 	}
 
@@ -206,7 +205,7 @@
 
 - (BOOL)isPleasedWith:(id)param error:(NSError **)anError {
 	if (![param isKindOfClass:[NSArray class]]) {
-		if (anError) *anError = CreateError(0, @"must be an array");
+		if (anError) *anError = [ParameterValidator leafError:@"must be an array"];
 		return NO;
 	}
 
@@ -265,7 +264,7 @@
 
 - (BOOL)isPleasedWith:(id)param error:(NSError **)anError {
 	if (![param isKindOfClass:[NSDictionary class]]) {
-		if (anError) *anError = CreateError(0, @"must be a dictionary");
+		if (anError) *anError = [ParameterValidator leafError:@"must be a dictionary"];
 		return NO;
 	}
 

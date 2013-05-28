@@ -7,7 +7,6 @@ default: validparams
 
 validparams: validparams.o \
 ParameterValidator.o \
-Error.o \
 DictionaryValidatorTest.o \
 ParameterValidatorTest.o \
 NumberValidatorTest.o \
@@ -18,8 +17,7 @@ ErrorReportingTest.o
 	$(CC) -o $@ $(CFLAGS) $^ -framework Foundation -framework SenTestingKit
 
 validparams.o: validparams.m
-ParameterValidator.o: ParameterValidator.m ParameterValidator.h Error.h
-Error.o: Error.m Error.h
+ParameterValidator.o: ParameterValidator.m ParameterValidator.h
 
 DictionaryValidatorTest.o: DictionaryValidatorTest.m DictionaryValidatorTest.h ParameterValidator.h
 ParameterValidatorTest.o: ParameterValidatorTest.m ParameterValidatorTest.h ParameterValidator.h
