@@ -21,6 +21,13 @@
 	STAssertEqualObjects([error localizedDescription], @"must be a string", nil);
 }
 
+- (void)testReportsLeafError {
+	NSError *error = nil;
+	STAssertFalse([[ParameterValidator string] isPleasedWith:@2 error:&error], nil);
+	STAssertEquals([error code], ParameterValidatorErrorCodeLeaf, nil);
+	STAssertEqualObjects([error domain], ParameterValidatorErrorDomain, nil);
+}
+
 - (void)testMinLength {
 	STAssertTrue([[[ParameterValidator string] min:@3] isPleasedWith:@"two" error:nil], nil);
 }

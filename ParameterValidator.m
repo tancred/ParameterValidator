@@ -210,12 +210,18 @@
 		return NO;
 	}
 
+	NSMutableArray *underlyingErrors = [NSMutableArray array];
+
 	for (NSUInteger i=0; i<[param count]; i++) {
 		id item = param[i];
 		NSError *paramError = nil;
 		if ([self.prototype isPleasedWith:item error:&paramError]) continue;
+		[underlyingErrors addObject: @[ @(i), paramError ]];
+	}
+
+	if ([underlyingErrors count]) {
 		if (anError)
-			*anError = CreateError(0, @"parameter %lu %@", i+1, [paramError localizedDescription]);
+			*anError = [ParameterValidator branchErrorForKeyedErrors:underlyingErrors];
 		return NO;
 	}
 
@@ -264,6 +270,7 @@
 	}
 
 	NSMutableSet *processedParameters = [NSMutableSet set];
+	NSMutableArray *underlyingErrors = [NSMutableArray array];
 
 	for (NSDictionary *each in self.validators) {
 		NSString *paramName = each[@"param"];
@@ -274,27 +281,29 @@
 		NSString *paramValue = param[paramName];
 		if (!paramValue) {
 			if (paramValidator.isOptional) continue;
-			if (anError)
-				*anError = CreateError(0, @"missing required parameter '%@'", paramName);
-			return NO;
+			[underlyingErrors addObject: @[ paramName, [ParameterValidator leafError:@"missing mandatory"]]];
+			continue;
 		}
 
 		NSError *paramError = nil;
 		if (![paramValidator isPleasedWith:paramValue error:&paramError]) {
-			if (anError)
-				*anError = CreateError(0, @"parameter '%@' %@", paramName, [paramError localizedDescription]);
-			return NO;
+			[underlyingErrors addObject: @[ paramName, paramError] ];
+			continue;
 		}
 	}
 
 	if (!self.allowsExtraParameters) {
 		NSMutableSet *superflousParameters = [NSMutableSet setWithArray:[param allKeys]];
 		[superflousParameters minusSet:processedParameters];
-		if ([superflousParameters count]) {
-			if (anError)
-				*anError = CreateError(0, @"superflous parameters %@", [[[superflousParameters allObjects] sortedArrayUsingSelector:@selector(compare:)] componentsJoinedByString:@", "]);
-			return NO;
+		for (id superflousParam in superflousParameters) {
+			[underlyingErrors addObject: @[ superflousParam, [ParameterValidator leafError:@"superflous parameter '%@'", superflousParam]]];
 		}
+	}
+
+	if ([underlyingErrors count]) {
+		if (anError)
+			*anError = [ParameterValidator branchErrorForKeyedErrors:underlyingErrors];
+		return NO;
 	}
 
 	return YES;

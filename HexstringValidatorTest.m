@@ -49,4 +49,11 @@
 	STAssertEqualObjects([error localizedDescription], @"must be a hexstring", nil);
 }
 
+- (void)testReportsLeafError {
+	NSError *error = nil;
+	STAssertFalse([[ParameterValidator hexstring] isPleasedWith:@"xyz" error:&error], nil);
+	STAssertEquals([error code], ParameterValidatorErrorCodeLeaf, nil);
+	STAssertEqualObjects([error domain], ParameterValidatorErrorDomain, nil);
+}
+
 @end
