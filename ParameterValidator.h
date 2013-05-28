@@ -68,6 +68,10 @@
 + (NSError *)branchErrorForKeyedErrors:(NSArray *)errors;
 @end
 
+@interface NSError (ParameterValidatorErrors)
+- (NSArray *)underlyingValidationErrorsForKey:(NSArray *)errorKey;
+@end
+
 extern NSString *ParameterValidatorErrorDomain;
 extern NSInteger ParameterValidatorErrorCodeLeaf;
 extern NSInteger ParameterValidatorErrorCodeBranch;

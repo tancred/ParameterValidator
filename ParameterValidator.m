@@ -376,6 +376,42 @@
 @end
 
 
+@implementation NSError (ParameterValidatorErrors)
+
+- (NSArray *)underlyingValidationErrorsForKey:(NSArray *)errorKey {
+	NSMutableArray *found = [NSMutableArray array];
+
+	if (!errorKey || ![errorKey count]) return found;
+
+	id firstComponent = errorKey[0];
+	NSArray *matchingSuberrors = [self directUnderlyingValidationErrorsForKey:firstComponent];
+
+	if ([errorKey count] > 1) {
+		NSArray *subkey = [errorKey subarrayWithRange:NSMakeRange(1,[errorKey count]-1)];
+		for (NSError *suberror in matchingSuberrors) {
+			[found addObjectsFromArray:[suberror underlyingValidationErrorsForKey:subkey]];
+		}
+	} else {
+		[found addObjectsFromArray:matchingSuberrors];
+	}
+
+	return found;
+}
+
+- (NSArray *)directUnderlyingValidationErrorsForKey:(id)aKey {
+	NSMutableArray *found = [NSMutableArray array];
+
+	for (NSArray *errorDesc in [[self userInfo] objectForKey:ParameterValidatorUnderlyingValidatorErrorsKey]) {
+		if (![errorDesc[0] isEqual:aKey]) continue;
+		[found addObject:errorDesc[1]];
+	}
+
+	return found;
+}
+
+@end
+
+
 NSString *ParameterValidatorErrorDomain = @"com.tancred.parametervalidator";
 NSInteger ParameterValidatorErrorCodeLeaf = 0;
 NSInteger ParameterValidatorErrorCodeBranch = 1;

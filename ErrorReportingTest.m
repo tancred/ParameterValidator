@@ -120,6 +120,83 @@
 	STAssertEqualObjects(keys, (@[ @[@"p1", @"p2.1", @"p3.1"], @[@"p1", @"p2.1", @"p3.2"], @[@"p1", @"p2.2", @33], @[@"p1", @"p2.2", @34] ]), nil);
 }
 
+- (void)testErrorsForUnknownKey {
+	NSError *error = [ParameterValidator branchErrorForKeyedErrors:@[
+		@[ @"p1", [ParameterValidator leafError:@"x"] ],
+	]];
+
+	STAssertEqualObjects([error underlyingValidationErrorsForKey:@[@"xy"]], @[], nil);
+	STAssertEqualObjects([error underlyingValidationErrorsForKey:@[]], @[], nil);
+	STAssertEqualObjects([error underlyingValidationErrorsForKey:nil], @[], nil);
+}
+
+- (void)testErrorForKeyInNestedErrorWithOneSublevel {
+	NSError *error = [ParameterValidator branchErrorForKeyedErrors:@[
+		@[ @"p1", [ParameterValidator leafError:@"x"] ],
+	]];
+
+	NSArray *lookedUp = [error underlyingValidationErrorsForKey:@[@"p1"]];
+	STAssertEquals([lookedUp count], (NSUInteger)1, nil);
+	STAssertEqualObjects([lookedUp[0] localizedDescription], @"x", nil);
+}
+
+- (void)testErrorForRepeatedKeyInNestedErrorWithOneSublevel {
+	NSError *error = [ParameterValidator branchErrorForKeyedErrors:@[
+		@[ @"p1", [ParameterValidator leafError:@"x"] ],
+		@[ @"p1", [ParameterValidator leafError:@"y"] ],
+	]];
+
+	NSArray *lookedUp = [error underlyingValidationErrorsForKey:@[@"p1"]];
+
+	STAssertEquals([lookedUp count], (NSUInteger)2, nil);
+	STAssertEqualObjects([lookedUp[0] localizedDescription], @"x", nil);
+	STAssertEqualObjects([lookedUp[1] localizedDescription], @"y", nil);
+}
+
+- (void)testErrorForKeyInNestedErrorWithTwoSublevels {
+	NSError *error = [ParameterValidator branchErrorForKeyedErrors:@[
+		@[ @"p1", [ParameterValidator branchErrorForKeyedErrors:@[
+				@[ @"p2", [ParameterValidator leafError:@"x"] ],
+			]]
+		],
+	]];
+
+	NSArray *lookedUp = [error underlyingValidationErrorsForKey:@[@"p1",@"p2"]];
+	STAssertEquals([lookedUp count], (NSUInteger)1, nil);
+	STAssertEqualObjects([lookedUp[0] localizedDescription], @"x", nil);
+}
+
+- (void)testErrorForIntermediateKeyInNestedErrorWithTwoSublevels {
+	NSError *error = [ParameterValidator branchErrorForKeyedErrors:@[
+		@[ @"p1", [ParameterValidator branchErrorForKeyedErrors:@[
+				@[ @"p2", [ParameterValidator leafError:@"x"] ],
+			]]
+		],
+	]];
+
+	NSArray *lookedUp = [error underlyingValidationErrorsForKey:@[@"p1"]];
+	STAssertEquals([lookedUp count], (NSUInteger)1, nil);
+	STAssertEqualObjects([lookedUp[0] localizedDescription], @"validation error for parameter 'p2': x", nil);
+}
+
+- (void)testErrorForRepeatedKeyInNestedErrorWithTwoSublevels {
+	NSError *error = [ParameterValidator branchErrorForKeyedErrors:@[
+		@[ @"p1", [ParameterValidator branchErrorForKeyedErrors:@[
+				@[ @"p2", [ParameterValidator leafError:@"x"] ],
+			]]
+		],
+		@[ @"p1", [ParameterValidator branchErrorForKeyedErrors:@[
+				@[ @"p2", [ParameterValidator leafError:@"y"] ],
+			]]
+		],
+	]];
+
+	NSArray *lookedUp = [error underlyingValidationErrorsForKey:@[@"p1",@"p2"]];
+	STAssertEquals([lookedUp count], (NSUInteger)2, nil);
+	STAssertEqualObjects([lookedUp[0] localizedDescription], @"x", nil);
+	STAssertEqualObjects([lookedUp[1] localizedDescription], @"y", nil);
+}
+
 - (void)testKeysForNumberError {
 	NSError *error = nil;
 	[[ParameterValidator number] isPleasedWith:@"two" error:&error];
