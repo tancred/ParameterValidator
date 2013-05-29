@@ -314,7 +314,9 @@
 @implementation ParameterValidator (ErrorReporting)
 
 + (NSArray *)underlyingErrorKeys:(NSError *)anError {
-	NSMutableArray *keys = [NSMutableArray array];
+	NSMutableArray *uniqueKeysInOrderEncountered = [NSMutableArray array];
+	NSMutableSet *uniqueKeys = [NSMutableSet set];
+
 	NSDictionary *underlyingErrors = [[anError userInfo] objectForKey:ParameterValidatorUnderlyingValidatorErrorsKey];
 
 	for (NSArray *eachError in underlyingErrors) {
@@ -323,13 +325,20 @@
 
 		if ([subKeys count]) {
 			for (id subKey in subKeys) {
-				[keys addObject:[@[key] arrayByAddingObjectsFromArray:subKey]];
+				id combinedKey = [@[key] arrayByAddingObjectsFromArray:subKey];
+				if ([uniqueKeys containsObject:combinedKey]) continue;
+				[uniqueKeys addObject:combinedKey];
+				[uniqueKeysInOrderEncountered addObject:combinedKey];
 			}
 		} else {
-			[keys addObject:@[key]];
+			id combinedKey = @[key];
+			if ([uniqueKeys containsObject:combinedKey]) continue;
+			[uniqueKeys addObject:combinedKey];
+			[uniqueKeysInOrderEncountered addObject:combinedKey];
 		}
 	}
-	return keys;
+
+	return uniqueKeysInOrderEncountered;
 }
 
 + (NSError *)leafError:(NSString *)fmt, ... {

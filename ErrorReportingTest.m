@@ -77,6 +77,35 @@
 	STAssertEqualObjects(keys, (@[ @[@"p1"], @[@2], @[@"p3"] ]), nil);
 }
 
+- (void)testKeysAreUnique {
+	NSError *error = [ParameterValidator branchErrorForKeyedErrors:@[
+		@[ @"p2", [ParameterValidator leafError:@"x"] ],
+		@[ @"p1", [ParameterValidator leafError:@"y"] ],
+		@[ @"p1", [ParameterValidator leafError:@"z"] ],
+	]];
+	NSArray *keys = [ParameterValidator underlyingErrorKeys:error];
+	STAssertEqualObjects(keys, (@[ @[@"p2"], @[@"p1"] ]), nil);
+}
+
+- (void)testNestedKeysAreUnique {
+	NSError *error = [ParameterValidator branchErrorForKeyedErrors:@[
+		@[ @"p1", [ParameterValidator branchErrorForKeyedErrors:@[
+				@[ @"p2", [ParameterValidator leafError:@"x"] ],
+			]]
+		],
+		@[ @"p1", [ParameterValidator branchErrorForKeyedErrors:@[
+				@[ @"p2", [ParameterValidator leafError:@"y"] ],
+			]]
+		],
+		@[ @"p1", [ParameterValidator branchErrorForKeyedErrors:@[
+				@[ @"p3", [ParameterValidator leafError:@"z"] ],
+			]]
+		],
+	]];
+	NSArray *keys = [ParameterValidator underlyingErrorKeys:error];
+	STAssertEqualObjects(keys, (@[ @[@"p1", @"p2"], @[@"p1", @"p3"] ]), nil);
+}
+
 - (void)testKeysForNestedErrorWithTwoSublevels {
 	NSError *error = [ParameterValidator branchErrorForKeyedErrors:@[
 		@[ @"p1", [ParameterValidator branchErrorForKeyedErrors:@[
