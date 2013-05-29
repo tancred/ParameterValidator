@@ -41,6 +41,11 @@
 @interface ArrayValidator : ParameterValidator
 @property (strong) ParameterValidator *prototype;
 - (instancetype)of:(ParameterValidator *)prototype;
+@property (copy) NSNumber *min;
+@property (copy) NSNumber *max;
+- (instancetype)count:(NSNumber *)limit; // min == max
+- (instancetype)min:(NSNumber *)limit;
+- (instancetype)max:(NSNumber *)limit;
 @end
 
 @interface DictionaryValidator : ParameterValidator

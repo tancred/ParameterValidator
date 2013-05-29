@@ -203,19 +203,68 @@
 	return self;
 }
 
+- (instancetype)count:(NSNumber *)limit {
+	self.min = limit;
+	self.max = limit;
+	return self;
+}
+
+- (instancetype)min:(NSNumber *)limit {
+	self.min = limit;
+	return self;
+}
+
+- (instancetype)max:(NSNumber *)limit {
+	self.max = limit;
+	return self;
+}
+
 - (BOOL)isPleasedWith:(id)param error:(NSError **)anError {
 	if (![param isKindOfClass:[NSArray class]]) {
 		if (anError) *anError = [ParameterValidator leafError:@"must be an array"];
 		return NO;
 	}
 
+	BOOL minFailed = NO;
+	BOOL maxFailed = NO;
+
+	if (self.min)
+		minFailed = [param count] < ((NSUInteger)[self.min integerValue]);
+
+	if (self.max)
+		maxFailed = [param count] > ((NSUInteger)[self.max integerValue]);
+
+	if (self.min && self.max && (minFailed || maxFailed)) {
+		if (anError) {
+			if ([self.min isEqual:self.max])
+				*anError = [ParameterValidator leafError:@"must have exactly %@ elements", self.min];
+			else
+				*anError = [ParameterValidator leafError:@"must have %@ to %@ elements", self.min, self.max];
+		}
+		return NO;
+	}
+
+	if (minFailed) {
+		if (anError)
+			*anError = [ParameterValidator leafError:@"must have at least %@ elements", self.min];
+		return NO;
+	}
+
+	if (maxFailed) {
+		if (anError)
+			*anError = [ParameterValidator leafError:@"must have at most %@ elements", self.max];
+		return NO;
+	}
+
 	NSMutableArray *underlyingErrors = [NSMutableArray array];
 
-	for (NSUInteger i=0; i<[param count]; i++) {
-		id item = param[i];
-		NSError *paramError = nil;
-		if ([self.prototype isPleasedWith:item error:&paramError]) continue;
-		[underlyingErrors addObject: @[ @(i), paramError ]];
+	if (self.prototype) {
+		for (NSUInteger i=0; i<[param count]; i++) {
+			id item = param[i];
+			NSError *paramError = nil;
+			if ([self.prototype isPleasedWith:item error:&paramError]) continue;
+			[underlyingErrors addObject: @[ @(i), paramError ]];
+		}
 	}
 
 	if ([underlyingErrors count]) {
