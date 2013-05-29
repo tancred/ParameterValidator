@@ -280,7 +280,7 @@
 		NSString *paramValue = param[paramName];
 		if (!paramValue) {
 			if (paramValidator.isOptional) continue;
-			[underlyingErrors addObject: @[ paramName, [ParameterValidator leafError:@"missing mandatory"]]];
+			[underlyingErrors addObject: @[ paramName, [ParameterValidator leafError:@"is missing"]]];
 			continue;
 		}
 

@@ -35,7 +35,7 @@
 
 	NSError *error = nil;
 	STAssertFalse([validator isPleasedWith:@{} error:&error], nil);
-	STAssertEqualObjects([error localizedDescription], @"validation error for parameter 'param': missing mandatory", nil);
+	STAssertEqualObjects([error localizedDescription], @"validation error for parameter 'param': is missing", nil);
 }
 
 - (void)testOptionalPresent {
