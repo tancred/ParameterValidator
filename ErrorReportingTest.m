@@ -226,6 +226,32 @@
 	STAssertEqualObjects([lookedUp[1] localizedDescription], @"y", nil);
 }
 
+- (void)testFlatteningFirstValidationError {
+	NSError *error = [ParameterValidator branchErrorForKeyedErrors:@[
+		@[ @"p1", [ParameterValidator branchErrorForKeyedErrors:@[
+				@[ @"p2", [ParameterValidator leafError:@"x"] ],
+			]]
+		],
+		@[ @"p1", [ParameterValidator branchErrorForKeyedErrors:@[
+				@[ @"p2", [ParameterValidator leafError:@"y"] ],
+			]]
+		],
+	]];
+
+	NSError *flattened = [error errorByFlatteningFirstValidationError];
+	STAssertEqualObjects([flattened domain], ParameterValidatorErrorDomain, nil);
+	STAssertEquals([flattened code], ParameterValidatorErrorCodeLeaf, nil);
+	STAssertEqualObjects([flattened localizedDescription], @"parameter p1.p2 x", nil);
+}
+
+- (void)testFlatteningFirstValidationErrorHandlesLeaf {
+	NSError *error = [ParameterValidator leafError:@"x"];
+	NSError *flattened = [error errorByFlatteningFirstValidationError];
+	STAssertEqualObjects([flattened domain], ParameterValidatorErrorDomain, nil);
+	STAssertEquals([flattened code], ParameterValidatorErrorCodeLeaf, nil);
+	STAssertEqualObjects([flattened localizedDescription], @"parameter x", nil);
+}
+
 - (void)testKeysForNumberError {
 	NSError *error = nil;
 	[[ParameterValidator number] isPleasedWith:@"two" error:&error];

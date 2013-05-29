@@ -70,6 +70,7 @@
 
 @interface NSError (ParameterValidatorErrors)
 - (NSArray *)underlyingValidationErrorsForKey:(NSArray *)errorKey;
+- (NSError *)errorByFlatteningFirstValidationError;
 @end
 
 extern NSString *ParameterValidatorErrorDomain;

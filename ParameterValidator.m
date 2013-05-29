@@ -382,6 +382,13 @@
 	return [NSError errorWithDomain:ParameterValidatorErrorDomain code:1 userInfo:userInfo];
 }
 
++ (NSString *)stringFromValidationErrorKey:(NSArray *)aKey {
+	NSMutableArray *components = [NSMutableArray array];
+	for (id component in aKey)
+		[components addObject:[component description]];
+	return [components componentsJoinedByString:@"."];
+}
+
 @end
 
 
@@ -416,6 +423,19 @@
 	}
 
 	return found;
+}
+
+- (NSError *)errorByFlatteningFirstValidationError {
+	if ([self code] == ParameterValidatorErrorCodeBranch) {
+		NSArray *firstKey = [ParameterValidator underlyingErrorKeys:self][0];
+		NSError *firstError = [self underlyingValidationErrorsForKey:firstKey][0];
+		return [ParameterValidator leafError:@"parameter %@ %@",
+			[ParameterValidator stringFromValidationErrorKey:firstKey],
+			[firstError localizedDescription]
+		];
+	}
+
+	return [ParameterValidator leafError:@"parameter %@", [self localizedDescription]];
 }
 
 @end
