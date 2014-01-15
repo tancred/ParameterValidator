@@ -1,5 +1,8 @@
-#import "ArrayValidatorTest.h"
+#import <SenTestingKit/SenTestingKit.h>
 #import "ParameterValidator.h"
+
+@interface ArrayValidatorTest : SenTestCase
+@end
 
 @implementation ArrayValidatorTest
 

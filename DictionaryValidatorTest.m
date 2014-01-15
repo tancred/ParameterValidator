@@ -1,5 +1,8 @@
-#import "DictionaryValidatorTest.h"
+#import <SenTestingKit/SenTestingKit.h>
 #import "ParameterValidator.h"
+
+@interface DictionaryValidatorTest : SenTestCase
+@end
 
 @implementation DictionaryValidatorTest
 

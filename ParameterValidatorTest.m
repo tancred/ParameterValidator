@@ -1,5 +1,8 @@
-#import "ParameterValidatorTest.h"
+#import <SenTestingKit/SenTestingKit.h>
 #import "ParameterValidator.h"
+
+@interface ParameterValidatorTest : SenTestCase
+@end
 
 @implementation ParameterValidatorTest
 

@@ -19,13 +19,13 @@ ErrorReportingTest.o
 validparams.o: validparams.m
 ParameterValidator.o: ParameterValidator.m ParameterValidator.h
 
-DictionaryValidatorTest.o: DictionaryValidatorTest.m DictionaryValidatorTest.h ParameterValidator.h
-ParameterValidatorTest.o: ParameterValidatorTest.m ParameterValidatorTest.h ParameterValidator.h
-NumberValidatorTest.o: NumberValidatorTest.m NumberValidatorTest.h ParameterValidator.h
-StringValidatorTest.o: StringValidatorTest.m StringValidatorTest.h ParameterValidator.h
-HexstringValidatorTest.o: HexstringValidatorTest.m HexstringValidatorTest.h ParameterValidator.h
-ArrayValidatorTest.o: ArrayValidatorTest.m ArrayValidatorTest.h ParameterValidator.h
-ErrorReportingTest.o: ErrorReportingTest.m ErrorReportingTest.h ParameterValidator.h
+DictionaryValidatorTest.o: DictionaryValidatorTest.m ParameterValidator.h
+ParameterValidatorTest.o: ParameterValidatorTest.m ParameterValidator.h
+NumberValidatorTest.o: NumberValidatorTest.m ParameterValidator.h
+StringValidatorTest.o: StringValidatorTest.m ParameterValidator.h
+HexstringValidatorTest.o: HexstringValidatorTest.m ParameterValidator.h
+ArrayValidatorTest.o: ArrayValidatorTest.m ParameterValidator.h
+ErrorReportingTest.o: ErrorReportingTest.m ParameterValidator.h
 
 %.o: %.m
 	$(CC) -c $(CFLAGS) $<

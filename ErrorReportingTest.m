@@ -1,6 +1,8 @@
-#import "ErrorReportingTest.h"
+#import <SenTestingKit/SenTestingKit.h>
 #import "ParameterValidator.h"
 
+@interface ErrorReportingTest : SenTestCase
+@end
 
 @implementation ErrorReportingTest
 

@@ -1,5 +1,8 @@
-#import "HexstringValidatorTest.h"
+#import <SenTestingKit/SenTestingKit.h>
 #import "ParameterValidator.h"
+
+@interface HexstringValidatorTest : SenTestCase
+@end
 
 @implementation HexstringValidatorTest
 
