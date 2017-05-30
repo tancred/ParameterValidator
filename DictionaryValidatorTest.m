@@ -1,35 +1,35 @@
-#import <SenTestingKit/SenTestingKit.h>
+#import <XCTest/XCTest.h>
 #import "ParameterValidator.h"
 
-@interface DictionaryValidatorTest : SenTestCase
+@interface DictionaryValidatorTest : XCTestCase
 @end
 
 @implementation DictionaryValidatorTest
 
 - (void)testInstance {
-	STAssertEqualObjects([[DictionaryValidator validator] class], [DictionaryValidator class], nil);
+	XCTAssertEqualObjects([[DictionaryValidator validator] class], [DictionaryValidator class]);
 }
 
 - (void)testConvenienceInstance {
-	STAssertEqualObjects([[ParameterValidator dictionary] class], [DictionaryValidator class], nil);
+	XCTAssertEqualObjects([[ParameterValidator dictionary] class], [DictionaryValidator class]);
 }
 
 - (void)testPleasedWithDictionary {
-	STAssertTrue([[ParameterValidator dictionary] isPleasedWith:@{} error:nil], nil);
+	XCTAssert([[ParameterValidator dictionary] isPleasedWith:@{} error:nil]);
 }
 
 - (void)testNotPleasedWithNonDictionary {
 	NSError *error = nil;
-	STAssertFalse([[ParameterValidator dictionary] isPleasedWith:@2 error:&error], nil);
-	STAssertEquals([error code], ParameterValidatorErrorCodeLeaf, nil);
-	STAssertEqualObjects([error domain], ParameterValidatorErrorDomain, nil);
-	STAssertEqualObjects([error localizedDescription], @"must be a dictionary", nil);
+	XCTAssertFalse([[ParameterValidator dictionary] isPleasedWith:@2 error:&error]);
+	XCTAssertEqual([error code], ParameterValidatorErrorCodeLeaf);
+	XCTAssertEqualObjects([error domain], ParameterValidatorErrorDomain);
+	XCTAssertEqualObjects([error localizedDescription], @"must be a dictionary");
 }
 
 - (void)testMandatoryPresent {
 	DictionaryValidator *validator = [DictionaryValidator validator];
 	[validator validate:@"param" with:[ParameterValidator validator]];
-	STAssertTrue([validator isPleasedWith:@{@"param":@"something"} error:nil], nil);
+	XCTAssert([validator isPleasedWith:@{@"param":@"something"} error:nil]);
 }
 
 - (void)testMandatoryMissing {
@@ -37,26 +37,26 @@
 	[validator validate:@"param" with:[ParameterValidator validator]];
 
 	NSError *error = nil;
-	STAssertFalse([validator isPleasedWith:@{} error:&error], nil);
-	STAssertEqualObjects([error localizedDescription], @"validation error for parameter 'param': is missing", nil);
+	XCTAssertFalse([validator isPleasedWith:@{} error:&error]);
+	XCTAssertEqualObjects([error localizedDescription], @"validation error for parameter 'param': is missing");
 }
 
 - (void)testOptionalPresent {
 	DictionaryValidator *validator = [DictionaryValidator validator];
 	[validator validate:@"param" with:[[ParameterValidator validator] optional]];
-	STAssertTrue([validator isPleasedWith:@{@"param":@"something"} error:nil], nil);
+	XCTAssert([validator isPleasedWith:@{@"param":@"something"} error:nil]);
 }
 
 - (void)testOptionalMissing {
 	DictionaryValidator *validator = [DictionaryValidator validator];
 	[validator validate:@"param" with:[[ParameterValidator validator] optional]];
-	STAssertTrue([validator isPleasedWith:@{} error:nil], nil);
+	XCTAssert([validator isPleasedWith:@{} error:nil]);
 }
 
 - (void)testPleasedWithParameter {
 	DictionaryValidator *validator = [DictionaryValidator validator];
 	[validator validate:@"param" with:[[ParameterValidator number] lessThan:@4]];
-	STAssertTrue([validator isPleasedWith:@{@"param":@3} error:nil], nil);
+	XCTAssert([validator isPleasedWith:@{@"param":@3} error:nil]);
 }
 
 - (void)testNotPleasedWithParameter {
@@ -64,8 +64,8 @@
 	[validator validate:@"param" with:[[ParameterValidator number] lessThan:@4]];
 
 	NSError *error = nil;
-	STAssertFalse([validator isPleasedWith:@{@"param":@4} error:&error], nil);
-	STAssertEqualObjects([error localizedDescription], @"validation error for parameter 'param': must be less than 4", nil);
+	XCTAssertFalse([validator isPleasedWith:@{@"param":@4} error:&error]);
+	XCTAssertEqualObjects([error localizedDescription], @"validation error for parameter 'param': must be less than 4");
 }
 
 - (void)testParametersValidatedInOrder {
@@ -74,27 +74,27 @@
 	[validator validate:@"param2" with:[ParameterValidator number]];
 
 	NSError *error = nil;
-	STAssertFalse([validator isPleasedWith:(@{@"param1":@3, @"param2":@"str"}) error:&error], nil);
-	STAssertEqualObjects([error localizedDescription], @"validation error for parameter 'param2': must be a number", nil);
+	XCTAssertFalse([validator isPleasedWith:(@{@"param1":@3, @"param2":@"str"}) error:&error]);
+	XCTAssertEqualObjects([error localizedDescription], @"validation error for parameter 'param2': must be a number");
 }
 
 - (void)testNotPleasedWithExtraParameters {
 	DictionaryValidator *validator = [[DictionaryValidator validator] merciless];
 
 	NSError *error = nil;
-	STAssertFalse([validator isPleasedWith:(@{@"param1":@3, @"param2":@"str", @"param3":@2}) error:&error], nil);
-	STAssertEqualObjects([error localizedDescription], @"validation error for multiple parameters", nil);
+	XCTAssertFalse([validator isPleasedWith:(@{@"param1":@3, @"param2":@"str", @"param3":@2}) error:&error]);
+	XCTAssertEqualObjects([error localizedDescription], @"validation error for multiple parameters");
 
 	NSArray *keys = [ParameterValidator underlyingErrorKeys:error];
-	STAssertEquals([keys count], (NSUInteger)3, nil);
-	STAssertTrue([keys containsObject:@[@"param1"]], nil);
-	STAssertTrue([keys containsObject:@[@"param2"]], nil);
-	STAssertTrue([keys containsObject:@[@"param3"]], nil);
+	XCTAssertEqual([keys count], (NSUInteger)3);
+	XCTAssert([keys containsObject:@[@"param1"]]);
+	XCTAssert([keys containsObject:@[@"param2"]]);
+	XCTAssert([keys containsObject:@[@"param3"]]);
 }
 
 - (void)testPleasedWithExtraParameters {
 	DictionaryValidator *validator = [[DictionaryValidator validator] merciful];
-	STAssertTrue([validator isPleasedWith:(@{@"param1":@3, @"param2":@"str", @"param3":@2}) error:nil], nil);
+	XCTAssert([validator isPleasedWith:(@{@"param1":@3, @"param2":@"str", @"param3":@2}) error:nil]);
 }
 
 - (void)testNested {
@@ -103,8 +103,8 @@
 		validate:@"param2" with:[ParameterValidator dictionary] ];
 
 	NSError *error = nil;
-	STAssertFalse([validator isPleasedWith:(@{@"param2":@2}) error:&error], nil);
-	STAssertEqualObjects([error localizedDescription], @"validation error for parameter 'param2': must be a dictionary", nil);
+	XCTAssertFalse([validator isPleasedWith:(@{@"param2":@2}) error:&error]);
+	XCTAssertEqualObjects([error localizedDescription], @"validation error for parameter 'param2': must be a dictionary");
 }
 
 - (void)testParameterErrorIsABranchError {
@@ -112,10 +112,10 @@
 	[validator validate:@"param" with:[[ParameterValidator number] lessThan:@4]];
 
 	NSError *error = nil;
-	STAssertFalse([validator isPleasedWith:@{@"param":@4} error:&error], nil);
-	STAssertEquals([error code], ParameterValidatorErrorCodeBranch, nil);
-	STAssertEqualObjects([error domain], ParameterValidatorErrorDomain, nil);
-	STAssertEqualObjects([error localizedDescription], @"validation error for parameter 'param': must be less than 4", nil);
+	XCTAssertFalse([validator isPleasedWith:@{@"param":@4} error:&error]);
+	XCTAssertEqual([error code], ParameterValidatorErrorCodeBranch);
+	XCTAssertEqualObjects([error domain], ParameterValidatorErrorDomain);
+	XCTAssertEqualObjects([error localizedDescription], @"validation error for parameter 'param': must be less than 4");
 }
 
 - (void)testReportsAllParameterErrors {
@@ -124,12 +124,12 @@
 	[validator validate:@"param2" with:[ParameterValidator validator]];
 
 	NSError *error = nil;
-	STAssertFalse([validator isPleasedWith:(@{@"param1":@4,@"param3":@"x",@"param4":@"y"}) error:&error], nil);
-	STAssertEquals([error code], ParameterValidatorErrorCodeBranch, nil);
-	STAssertEqualObjects([error domain], ParameterValidatorErrorDomain, nil);
-	STAssertEqualObjects([error localizedDescription], @"validation error for multiple parameters", nil);
+	XCTAssertFalse([validator isPleasedWith:(@{@"param1":@4,@"param3":@"x",@"param4":@"y"}) error:&error]);
+	XCTAssertEqual([error code], ParameterValidatorErrorCodeBranch);
+	XCTAssertEqualObjects([error domain], ParameterValidatorErrorDomain);
+	XCTAssertEqualObjects([error localizedDescription], @"validation error for multiple parameters");
 
-	STAssertEqualObjects([ParameterValidator underlyingErrorKeys:error], (@[ @[@"param1"],@[@"param2"],@[@"param3"],@[@"param4"] ]), nil);
+	XCTAssertEqualObjects([ParameterValidator underlyingErrorKeys:error], (@[ @[@"param1"],@[@"param2"],@[@"param3"],@[@"param4"] ]));
 }
 
 @end

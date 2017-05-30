@@ -1,89 +1,89 @@
-#import <SenTestingKit/SenTestingKit.h>
+#import <XCTest/XCTest.h>
 #import "ParameterValidator.h"
 
-@interface NumberValidatorTest : SenTestCase
+@interface NumberValidatorTest : XCTestCase
 @end
 
 @implementation NumberValidatorTest
 
 - (void)testInstance {
-	STAssertEqualObjects([[NumberValidator validator] class], [NumberValidator class], nil);
+	XCTAssertEqualObjects([[NumberValidator validator] class], [NumberValidator class]);
 }
 
 - (void)testConvenienceInstance {
-	STAssertEqualObjects([[ParameterValidator number] class], [NumberValidator class], nil);
+	XCTAssertEqualObjects([[ParameterValidator number] class], [NumberValidator class]);
 }
 
 - (void)testPleasedWithNumber {
-	STAssertTrue([[ParameterValidator number] isPleasedWith:@2 error:nil], nil);
+	XCTAssert([[ParameterValidator number] isPleasedWith:@2 error:nil]);
 }
 
 - (void)testNotPleasedWithNonNumber {
 	NSError *error = nil;
-	STAssertFalse([[ParameterValidator number] isPleasedWith:@"two" error:&error], nil);
-	STAssertEqualObjects([error localizedDescription], @"must be a number", nil);
+	XCTAssertFalse([[ParameterValidator number] isPleasedWith:@"two" error:&error]);
+	XCTAssertEqualObjects([error localizedDescription], @"must be a number");
 }
 
 - (void)testReportsLeafError {
 	NSError *error = nil;
-	STAssertFalse([[ParameterValidator number] isPleasedWith:@"two" error:&error], nil);
-	STAssertEquals([error code], ParameterValidatorErrorCodeLeaf, nil);
-	STAssertEqualObjects([error domain], ParameterValidatorErrorDomain, nil);
+	XCTAssertFalse([[ParameterValidator number] isPleasedWith:@"two" error:&error]);
+	XCTAssertEqual([error code], ParameterValidatorErrorCodeLeaf);
+	XCTAssertEqualObjects([error domain], ParameterValidatorErrorDomain);
 }
 
 - (void)testLessThan {
-	STAssertTrue([[[ParameterValidator number] lessThan:@3] isPleasedWith:@2 error:nil], nil);
+	XCTAssert([[[ParameterValidator number] lessThan:@3] isPleasedWith:@2 error:nil]);
 }
 
 - (void)testLessThanError {
 	NSError *error = nil;
-	STAssertFalse([[[ParameterValidator number] lessThan:@3] isPleasedWith:@3 error:&error], nil);
-	STAssertEqualObjects([error localizedDescription], @"must be less than 3", nil);
+	XCTAssertFalse([[[ParameterValidator number] lessThan:@3] isPleasedWith:@3 error:&error]);
+	XCTAssertEqualObjects([error localizedDescription], @"must be less than 3");
 }
 
 - (void)testAtMost {
-	STAssertTrue([[[ParameterValidator number] atMost:@3] isPleasedWith:@3 error:nil], nil);
+	XCTAssert([[[ParameterValidator number] atMost:@3] isPleasedWith:@3 error:nil]);
 }
 
 - (void)testAtMostError {
 	NSError *error = nil;
-	STAssertFalse([[[ParameterValidator number] atMost:@3] isPleasedWith:@4 error:&error], nil);
-	STAssertEqualObjects([error localizedDescription], @"must be at most 3", nil);
+	XCTAssertFalse([[[ParameterValidator number] atMost:@3] isPleasedWith:@4 error:&error]);
+	XCTAssertEqualObjects([error localizedDescription], @"must be at most 3");
 }
 
 - (void)testGreaterThan {
-	STAssertTrue([[[ParameterValidator number] greaterThan:@3] isPleasedWith:@4 error:nil], nil);
+	XCTAssert([[[ParameterValidator number] greaterThan:@3] isPleasedWith:@4 error:nil]);
 }
 
 - (void)testGreaterThanError {
 	NSError *error = nil;
-	STAssertFalse([[[ParameterValidator number] greaterThan:@3] isPleasedWith:@3 error:&error], nil);
-	STAssertEqualObjects([error localizedDescription], @"must be greater than 3", nil);
+	XCTAssertFalse([[[ParameterValidator number] greaterThan:@3] isPleasedWith:@3 error:&error]);
+	XCTAssertEqualObjects([error localizedDescription], @"must be greater than 3");
 }
 
 - (void)testAtLeast {
-	STAssertTrue([[[ParameterValidator number] atLeast:@3] isPleasedWith:@3 error:nil], nil);
+	XCTAssert([[[ParameterValidator number] atLeast:@3] isPleasedWith:@3 error:nil]);
 }
 
 - (void)testAtLeastError {
 	NSError *error = nil;
-	STAssertFalse([[[ParameterValidator number] atLeast:@3] isPleasedWith:@2 error:&error], nil);
-	STAssertEqualObjects([error localizedDescription], @"must be at least 3", nil);
+	XCTAssertFalse([[[ParameterValidator number] atLeast:@3] isPleasedWith:@2 error:&error]);
+	XCTAssertEqualObjects([error localizedDescription], @"must be at least 3");
 }
 
 - (void)testLowAndHigh {
-	STAssertTrue([[[[ParameterValidator number] atLeast:@3] atMost:@5] isPleasedWith:@4 error:nil], nil);
+	XCTAssert([[[[ParameterValidator number] atLeast:@3] atMost:@5] isPleasedWith:@4 error:nil]);
 }
 
 - (void)testLowAndHighError {
 	ParameterValidator *validator = [[[ParameterValidator number] atLeast:@3] lessThan:@5];
 	NSError *error = nil;
 
-	STAssertFalse([validator isPleasedWith:@2 error:&error], nil);
-	STAssertEqualObjects([error localizedDescription], @"must be in [3,5)", nil);
+	XCTAssertFalse([validator isPleasedWith:@2 error:&error]);
+	XCTAssertEqualObjects([error localizedDescription], @"must be in [3,5)");
 
-	STAssertFalse([validator isPleasedWith:@5 error:&error], nil);
-	STAssertEqualObjects([error localizedDescription], @"must be in [3,5)", nil);
+	XCTAssertFalse([validator isPleasedWith:@5 error:&error]);
+	XCTAssertEqualObjects([error localizedDescription], @"must be in [3,5)");
 }
 
 @end

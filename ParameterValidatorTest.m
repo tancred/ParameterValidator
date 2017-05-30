@@ -1,41 +1,41 @@
-#import <SenTestingKit/SenTestingKit.h>
+#import <XCTest/XCTest.h>
 #import "ParameterValidator.h"
 
-@interface ParameterValidatorTest : SenTestCase
+@interface ParameterValidatorTest : XCTestCase
 @end
 
 @implementation ParameterValidatorTest
 
 - (void)testInstance {
-	STAssertEqualObjects([[ParameterValidator validator] class], [ParameterValidator class], nil);
+	XCTAssertEqualObjects([[ParameterValidator validator] class], [ParameterValidator class]);
 }
 
 - (void)testMandatoryByDefault {
-	STAssertFalse([[ParameterValidator validator] isOptional], nil);
+	XCTAssertFalse([[ParameterValidator validator] isOptional]);
 }
 
 - (void)testOptional {
-	STAssertTrue([[[ParameterValidator validator] optional] isOptional], nil);
+	XCTAssert([[[ParameterValidator validator] optional] isOptional]);
 }
 
 - (void)testMandatory {
-	STAssertFalse([[[[ParameterValidator validator] optional] mandatory] isOptional], nil);
+	XCTAssertFalse([[[[ParameterValidator validator] optional] mandatory] isOptional]);
 }
 
 - (void)testOptionalReturnsSelf {
 	ParameterValidator *validator = [ParameterValidator validator];
 	ParameterValidator *optional = [validator optional];
-	STAssertEquals(validator, optional, nil);
+	XCTAssertEqual(validator, optional);
 }
 
 - (void)testMandatoryReturnsSelf {
 	ParameterValidator *validator = [ParameterValidator validator];
 	ParameterValidator *mandatory = [validator mandatory];
-	STAssertEquals(validator, mandatory, nil);
+	XCTAssertEqual(validator, mandatory);
 }
 
 - (void)testAlwaysPleased {
-	STAssertTrue([[ParameterValidator validator] isPleasedWith:nil error:nil], nil);
+	XCTAssert([[ParameterValidator validator] isPleasedWith:nil error:nil]);
 }
 
 @end

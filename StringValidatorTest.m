@@ -1,87 +1,87 @@
-#import <SenTestingKit/SenTestingKit.h>
+#import <XCTest/XCTest.h>
 #import "ParameterValidator.h"
 
-@interface StringValidatorTest : SenTestCase
+@interface StringValidatorTest : XCTestCase
 @end
 
 @implementation StringValidatorTest
 
 - (void)testInstance {
-	STAssertEqualObjects([[StringValidator validator] class], [StringValidator class], nil);
+	XCTAssertEqualObjects([[StringValidator validator] class], [StringValidator class]);
 }
 
 - (void)testConvenienceInstance {
-	STAssertEqualObjects([[ParameterValidator string] class], [StringValidator class], nil);
+	XCTAssertEqualObjects([[ParameterValidator string] class], [StringValidator class]);
 }
 
 - (void)testPleasedWithString {
-	STAssertTrue([[ParameterValidator string] isPleasedWith:@"two" error:nil], nil);
+	XCTAssert([[ParameterValidator string] isPleasedWith:@"two" error:nil]);
 }
 
 - (void)testNotPleasedWithNonString {
 	NSError *error = nil;
-	STAssertFalse([[ParameterValidator string] isPleasedWith:@2 error:&error], nil);
-	STAssertEqualObjects([error localizedDescription], @"must be a string", nil);
+	XCTAssertFalse([[ParameterValidator string] isPleasedWith:@2 error:&error]);
+	XCTAssertEqualObjects([error localizedDescription], @"must be a string");
 }
 
 - (void)testReportsLeafError {
 	NSError *error = nil;
-	STAssertFalse([[ParameterValidator string] isPleasedWith:@2 error:&error], nil);
-	STAssertEquals([error code], ParameterValidatorErrorCodeLeaf, nil);
-	STAssertEqualObjects([error domain], ParameterValidatorErrorDomain, nil);
+	XCTAssertFalse([[ParameterValidator string] isPleasedWith:@2 error:&error]);
+	XCTAssertEqual([error code], ParameterValidatorErrorCodeLeaf);
+	XCTAssertEqualObjects([error domain], ParameterValidatorErrorDomain);
 }
 
 - (void)testMinLength {
-	STAssertTrue([[[ParameterValidator string] min:@3] isPleasedWith:@"two" error:nil], nil);
+	XCTAssert([[[ParameterValidator string] min:@3] isPleasedWith:@"two" error:nil]);
 }
 
 - (void)testMinLengthError {
 	NSError *error = nil;
-	STAssertFalse([[[ParameterValidator string] min:@3] isPleasedWith:@"to" error:&error], nil);
-	STAssertEqualObjects([error localizedDescription], @"must be at least 3 characters", nil);
+	XCTAssertFalse([[[ParameterValidator string] min:@3] isPleasedWith:@"to" error:&error]);
+	XCTAssertEqualObjects([error localizedDescription], @"must be at least 3 characters");
 }
 
 - (void)testMaxLength {
-	STAssertTrue([[[ParameterValidator string] max:@3] isPleasedWith:@"two" error:nil], nil);
+	XCTAssert([[[ParameterValidator string] max:@3] isPleasedWith:@"two" error:nil]);
 }
 
 - (void)testMaxLengthError {
 	NSError *error = nil;
-	STAssertFalse([[[ParameterValidator string] max:@3] isPleasedWith:@"three" error:&error], nil);
-	STAssertEqualObjects([error localizedDescription], @"must be at most 3 characters", nil);
+	XCTAssertFalse([[[ParameterValidator string] max:@3] isPleasedWith:@"three" error:&error]);
+	XCTAssertEqualObjects([error localizedDescription], @"must be at most 3 characters");
 }
 
 - (void)testMinAndMax {
-	STAssertTrue([[[[ParameterValidator string] min:@3] max:@5] isPleasedWith:@"two" error:nil], nil);
+	XCTAssert([[[[ParameterValidator string] min:@3] max:@5] isPleasedWith:@"two" error:nil]);
 }
 
 - (void)testMinAndMaxError {
 	ParameterValidator *validator = [[[ParameterValidator string] min:@3] max:@5];
 	NSError *error = nil;
 
-	STAssertFalse([validator isPleasedWith:@"to" error:&error], nil);
-	STAssertEqualObjects([error localizedDescription], @"must be 3 to 5 characters", nil);
+	XCTAssertFalse([validator isPleasedWith:@"to" error:&error]);
+	XCTAssertEqualObjects([error localizedDescription], @"must be 3 to 5 characters");
 
-	STAssertFalse([validator isPleasedWith:@"threee" error:&error], nil);
-	STAssertEqualObjects([error localizedDescription], @"must be 3 to 5 characters", nil);
+	XCTAssertFalse([validator isPleasedWith:@"threee" error:&error]);
+	XCTAssertEqualObjects([error localizedDescription], @"must be 3 to 5 characters");
 }
 
 - (void)testSameMinMax {
 	NSError *error = nil;
-	STAssertFalse([[[[ParameterValidator string] min:@3] max:@3] isPleasedWith:@"three" error:&error], nil);
-	STAssertEqualObjects([error localizedDescription], @"must be exactly 3 characters", nil);
+	XCTAssertFalse([[[[ParameterValidator string] min:@3] max:@3] isPleasedWith:@"three" error:&error]);
+	XCTAssertEqualObjects([error localizedDescription], @"must be exactly 3 characters");
 }
 
 - (void)testLength {
-	STAssertTrue([[[ParameterValidator string] length:@3] isPleasedWith:@"two" error:nil], nil);
+	XCTAssert([[[ParameterValidator string] length:@3] isPleasedWith:@"two" error:nil]);
 }
 
 - (void)testLengthErrorSameAsMinMax {
 	ParameterValidator *validator = [[ParameterValidator string] length:@3];
 	NSError *error = nil;
 
-	STAssertFalse([validator isPleasedWith:@"to" error:&error], nil);
-	STAssertEqualObjects([error localizedDescription], @"must be exactly 3 characters", nil);
+	XCTAssertFalse([validator isPleasedWith:@"to" error:&error]);
+	XCTAssertEqualObjects([error localizedDescription], @"must be exactly 3 characters");
 }
 
 @end

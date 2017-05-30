@@ -1,24 +1,24 @@
-#import <SenTestingKit/SenTestingKit.h>
+#import <XCTest/XCTest.h>
 #import "ParameterValidator.h"
 
-@interface ErrorReportingTest : SenTestCase
+@interface ErrorReportingTest : XCTestCase
 @end
 
 @implementation ErrorReportingTest
 
 - (void)testCreateLeafError {
 	NSError *actual = [ParameterValidator leafError:@"some %@", @"problem"];
-	STAssertEqualObjects([actual domain], ParameterValidatorErrorDomain, nil);
-	STAssertEquals([actual code], ParameterValidatorErrorCodeLeaf, nil);
-	STAssertEqualObjects([actual localizedDescription], @"some problem", nil);
+	XCTAssertEqualObjects([actual domain], ParameterValidatorErrorDomain);
+	XCTAssertEqual([actual code], ParameterValidatorErrorCodeLeaf);
+	XCTAssertEqualObjects([actual localizedDescription], @"some problem");
 }
 
 - (void)testCreateLeafErrorFromError {
 	NSError *underlying = [NSError errorWithDomain:@"dom" code:13 userInfo:@{NSLocalizedDescriptionKey: @"sub-prob"}];
 	NSError *actual = [ParameterValidator leafErrorFromError:underlying format:@"some %@", @"prob"];
-	STAssertEqualObjects([actual domain], ParameterValidatorErrorDomain, nil);
-	STAssertEquals([actual code], ParameterValidatorErrorCodeLeaf, nil);
-	STAssertEqualObjects([actual localizedDescription], @"some prob sub-prob", nil);
+	XCTAssertEqualObjects([actual domain], ParameterValidatorErrorDomain);
+	XCTAssertEqual([actual code], ParameterValidatorErrorCodeLeaf);
+	XCTAssertEqualObjects([actual localizedDescription], @"some prob sub-prob");
 }
 
 - (void)testCreateBranchError {
@@ -26,21 +26,21 @@
 		@[ @"key1", [ParameterValidator leafError:@"error1"] ]
 	];
 	NSError *actual = [ParameterValidator branchErrorForKeyedErrors:underlying];
-	STAssertEqualObjects([actual domain], ParameterValidatorErrorDomain, nil);
-	STAssertEquals([actual code], ParameterValidatorErrorCodeBranch, nil);
-	STAssertEqualObjects([actual localizedDescription], @"validation error for parameter 'key1': error1", nil);
+	XCTAssertEqualObjects([actual domain], ParameterValidatorErrorDomain);
+	XCTAssertEqual([actual code], ParameterValidatorErrorCodeBranch);
+	XCTAssertEqualObjects([actual localizedDescription], @"validation error for parameter 'key1': error1");
 
 	NSArray *actualUnderlying = [actual userInfo][ParameterValidatorUnderlyingValidatorErrorsKey];
-	STAssertEquals([actualUnderlying count], (NSUInteger)1, nil);
+	XCTAssertEqual([actualUnderlying count], (NSUInteger)1);
 
 	NSArray *underlyingErrorDesc = actualUnderlying[0];
-	STAssertEquals([underlyingErrorDesc count], (NSUInteger)2, nil);
-	STAssertEqualObjects(underlyingErrorDesc[0], @"key1", nil);
+	XCTAssertEqual([underlyingErrorDesc count], (NSUInteger)2);
+	XCTAssertEqualObjects(underlyingErrorDesc[0], @"key1");
 
 	NSError *theError = underlyingErrorDesc[1];
-	STAssertEqualObjects([theError domain], ParameterValidatorErrorDomain, nil);
-	STAssertEquals([theError code], ParameterValidatorErrorCodeLeaf, nil);
-	STAssertEqualObjects([theError localizedDescription], @"error1", nil);
+	XCTAssertEqualObjects([theError domain], ParameterValidatorErrorDomain);
+	XCTAssertEqual([theError code], ParameterValidatorErrorCodeLeaf);
+	XCTAssertEqualObjects([theError localizedDescription], @"error1");
 }
 
 - (void)testCreateBranchErrorWithMultipleErrors {
@@ -49,24 +49,24 @@
 		@[ @"key2", [ParameterValidator leafError:@"error2"] ]
 	];
 	NSError *actual = [ParameterValidator branchErrorForKeyedErrors:underlying];
-	STAssertEqualObjects([actual domain], ParameterValidatorErrorDomain, nil);
-	STAssertEquals([actual code], ParameterValidatorErrorCodeBranch, nil);
-	STAssertEqualObjects([actual localizedDescription], @"validation error for multiple parameters", nil);
+	XCTAssertEqualObjects([actual domain], ParameterValidatorErrorDomain);
+	XCTAssertEqual([actual code], ParameterValidatorErrorCodeBranch);
+	XCTAssertEqualObjects([actual localizedDescription], @"validation error for multiple parameters");
 
 	NSArray *actualUnderlying = [actual userInfo][ParameterValidatorUnderlyingValidatorErrorsKey];
-	STAssertEquals([actualUnderlying count], (NSUInteger)2, nil);
+	XCTAssertEqual([actualUnderlying count], (NSUInteger)2);
 
-	STAssertEqualObjects(actualUnderlying[0][0], @"key1", nil);
-	STAssertEqualObjects([actualUnderlying[0][1] localizedDescription], @"error1", nil);
+	XCTAssertEqualObjects(actualUnderlying[0][0], @"key1");
+	XCTAssertEqualObjects([actualUnderlying[0][1] localizedDescription], @"error1");
 
-	STAssertEqualObjects(actualUnderlying[1][0], @"key2", nil);
-	STAssertEqualObjects([actualUnderlying[1][1] localizedDescription], @"error2", nil);
+	XCTAssertEqualObjects(actualUnderlying[1][0], @"key2");
+	XCTAssertEqualObjects([actualUnderlying[1][1] localizedDescription], @"error2");
 }
 
 - (void)testKeysForLeafError {
 	NSError *error = [ParameterValidator leafError:@"some error"];
 	NSArray *keys = [ParameterValidator underlyingErrorKeys:error];
-	STAssertEqualObjects(keys, (@[]), nil);
+	XCTAssertEqualObjects(keys, (@[]));
 }
 
 - (void)testKeysForNestedErrorWithOneSublevel {
@@ -76,7 +76,7 @@
 		@[ @"p3", [ParameterValidator leafError:@"z"] ],
 	]];
 	NSArray *keys = [ParameterValidator underlyingErrorKeys:error];
-	STAssertEqualObjects(keys, (@[ @[@"p1"], @[@2], @[@"p3"] ]), nil);
+	XCTAssertEqualObjects(keys, (@[ @[@"p1"], @[@2], @[@"p3"] ]));
 }
 
 - (void)testKeysAreUnique {
@@ -86,7 +86,7 @@
 		@[ @"p1", [ParameterValidator leafError:@"z"] ],
 	]];
 	NSArray *keys = [ParameterValidator underlyingErrorKeys:error];
-	STAssertEqualObjects(keys, (@[ @[@"p2"], @[@"p1"] ]), nil);
+	XCTAssertEqualObjects(keys, (@[ @[@"p2"], @[@"p1"] ]));
 }
 
 - (void)testNestedKeysAreUnique {
@@ -105,7 +105,7 @@
 		],
 	]];
 	NSArray *keys = [ParameterValidator underlyingErrorKeys:error];
-	STAssertEqualObjects(keys, (@[ @[@"p1", @"p2"], @[@"p1", @"p3"] ]), nil);
+	XCTAssertEqualObjects(keys, (@[ @[@"p1", @"p2"], @[@"p1", @"p3"] ]));
 }
 
 - (void)testKeysForNestedErrorWithTwoSublevels {
@@ -116,7 +116,7 @@
 		],
 	]];
 	NSArray *keys = [ParameterValidator underlyingErrorKeys:error];
-	STAssertEqualObjects(keys, (@[ @[@"p1", @"p2"] ]), nil);
+	XCTAssertEqualObjects(keys, (@[ @[@"p1", @"p2"] ]));
 }
 
 - (void)testKeysForNestedErrorWithTwoSublevelsAndTwoLeafs {
@@ -128,7 +128,7 @@
 		],
 	]];
 	NSArray *keys = [ParameterValidator underlyingErrorKeys:error];
-	STAssertEqualObjects(keys, (@[ @[@"p1", @"p2.1"], @[@"p1", @22] ]), nil);
+	XCTAssertEqualObjects(keys, (@[ @[@"p1", @"p2.1"], @[@"p1", @22] ]));
 }
 
 - (void)testKeysForNestedErrorWithTwoSublevelsAndTwoLeafsInSeparateSublevels {
@@ -148,7 +148,7 @@
 		],
 	]];
 	NSArray *keys = [ParameterValidator underlyingErrorKeys:error];
-	STAssertEqualObjects(keys, (@[ @[@"p1", @"p2.1", @"p3.1"], @[@"p1", @"p2.1", @"p3.2"], @[@"p1", @"p2.2", @33], @[@"p1", @"p2.2", @34] ]), nil);
+	XCTAssertEqualObjects(keys, (@[ @[@"p1", @"p2.1", @"p3.1"], @[@"p1", @"p2.1", @"p3.2"], @[@"p1", @"p2.2", @33], @[@"p1", @"p2.2", @34] ]));
 }
 
 - (void)testErrorsForUnknownKey {
@@ -156,9 +156,9 @@
 		@[ @"p1", [ParameterValidator leafError:@"x"] ],
 	]];
 
-	STAssertEqualObjects([error underlyingValidationErrorsForKey:@[@"xy"]], @[], nil);
-	STAssertEqualObjects([error underlyingValidationErrorsForKey:@[]], @[], nil);
-	STAssertEqualObjects([error underlyingValidationErrorsForKey:nil], @[], nil);
+	XCTAssertEqualObjects([error underlyingValidationErrorsForKey:@[@"xy"]], @[]);
+	XCTAssertEqualObjects([error underlyingValidationErrorsForKey:@[]], @[]);
+	XCTAssertEqualObjects([error underlyingValidationErrorsForKey:nil], @[]);
 }
 
 - (void)testErrorForKeyInNestedErrorWithOneSublevel {
@@ -167,8 +167,8 @@
 	]];
 
 	NSArray *lookedUp = [error underlyingValidationErrorsForKey:@[@"p1"]];
-	STAssertEquals([lookedUp count], (NSUInteger)1, nil);
-	STAssertEqualObjects([lookedUp[0] localizedDescription], @"x", nil);
+	XCTAssertEqual([lookedUp count], (NSUInteger)1);
+	XCTAssertEqualObjects([lookedUp[0] localizedDescription], @"x");
 }
 
 - (void)testErrorForRepeatedKeyInNestedErrorWithOneSublevel {
@@ -179,9 +179,9 @@
 
 	NSArray *lookedUp = [error underlyingValidationErrorsForKey:@[@"p1"]];
 
-	STAssertEquals([lookedUp count], (NSUInteger)2, nil);
-	STAssertEqualObjects([lookedUp[0] localizedDescription], @"x", nil);
-	STAssertEqualObjects([lookedUp[1] localizedDescription], @"y", nil);
+	XCTAssertEqual([lookedUp count], (NSUInteger)2);
+	XCTAssertEqualObjects([lookedUp[0] localizedDescription], @"x");
+	XCTAssertEqualObjects([lookedUp[1] localizedDescription], @"y");
 }
 
 - (void)testErrorForKeyInNestedErrorWithTwoSublevels {
@@ -193,8 +193,8 @@
 	]];
 
 	NSArray *lookedUp = [error underlyingValidationErrorsForKey:@[@"p1",@"p2"]];
-	STAssertEquals([lookedUp count], (NSUInteger)1, nil);
-	STAssertEqualObjects([lookedUp[0] localizedDescription], @"x", nil);
+	XCTAssertEqual([lookedUp count], (NSUInteger)1);
+	XCTAssertEqualObjects([lookedUp[0] localizedDescription], @"x");
 }
 
 - (void)testErrorForIntermediateKeyInNestedErrorWithTwoSublevels {
@@ -206,8 +206,8 @@
 	]];
 
 	NSArray *lookedUp = [error underlyingValidationErrorsForKey:@[@"p1"]];
-	STAssertEquals([lookedUp count], (NSUInteger)1, nil);
-	STAssertEqualObjects([lookedUp[0] localizedDescription], @"validation error for parameter 'p2': x", nil);
+	XCTAssertEqual([lookedUp count], (NSUInteger)1);
+	XCTAssertEqualObjects([lookedUp[0] localizedDescription], @"validation error for parameter 'p2': x");
 }
 
 - (void)testErrorForRepeatedKeyInNestedErrorWithTwoSublevels {
@@ -223,9 +223,9 @@
 	]];
 
 	NSArray *lookedUp = [error underlyingValidationErrorsForKey:@[@"p1",@"p2"]];
-	STAssertEquals([lookedUp count], (NSUInteger)2, nil);
-	STAssertEqualObjects([lookedUp[0] localizedDescription], @"x", nil);
-	STAssertEqualObjects([lookedUp[1] localizedDescription], @"y", nil);
+	XCTAssertEqual([lookedUp count], (NSUInteger)2);
+	XCTAssertEqualObjects([lookedUp[0] localizedDescription], @"x");
+	XCTAssertEqualObjects([lookedUp[1] localizedDescription], @"y");
 }
 
 - (void)testFlatteningFirstValidationError {
@@ -241,35 +241,35 @@
 	]];
 
 	NSError *flattened = [error errorByFlatteningFirstValidationError];
-	STAssertEqualObjects([flattened domain], ParameterValidatorErrorDomain, nil);
-	STAssertEquals([flattened code], ParameterValidatorErrorCodeLeaf, nil);
-	STAssertEqualObjects([flattened localizedDescription], @"parameter p1.p2 x", nil);
+	XCTAssertEqualObjects([flattened domain], ParameterValidatorErrorDomain);
+	XCTAssertEqual([flattened code], ParameterValidatorErrorCodeLeaf);
+	XCTAssertEqualObjects([flattened localizedDescription], @"parameter p1.p2 x");
 }
 
 - (void)testFlatteningFirstValidationErrorHandlesLeaf {
 	NSError *error = [ParameterValidator leafError:@"x"];
 	NSError *flattened = [error errorByFlatteningFirstValidationError];
-	STAssertEqualObjects([flattened domain], ParameterValidatorErrorDomain, nil);
-	STAssertEquals([flattened code], ParameterValidatorErrorCodeLeaf, nil);
-	STAssertEqualObjects([flattened localizedDescription], @"parameter x", nil);
+	XCTAssertEqualObjects([flattened domain], ParameterValidatorErrorDomain);
+	XCTAssertEqual([flattened code], ParameterValidatorErrorCodeLeaf);
+	XCTAssertEqualObjects([flattened localizedDescription], @"parameter x");
 }
 
 - (void)testKeysForNumberError {
 	NSError *error = nil;
 	[[ParameterValidator number] isPleasedWith:@"two" error:&error];
-	STAssertEqualObjects([ParameterValidator underlyingErrorKeys:error], @[], nil);
+	XCTAssertEqualObjects([ParameterValidator underlyingErrorKeys:error], @[]);
 }
 
 - (void)testKeysForDictionaryTypeError {
 	NSError *error = nil;
 	[[ParameterValidator dictionary] isPleasedWith:@"string" error:&error];
-	STAssertEqualObjects([ParameterValidator underlyingErrorKeys:error], @[], nil);
+	XCTAssertEqualObjects([ParameterValidator underlyingErrorKeys:error], @[]);
 }
 
 - (void)testKeysForArrayTypeError {
 	NSError *error = nil;
 	[[ParameterValidator array] isPleasedWith:@"string" error:&error];
-	STAssertEqualObjects([ParameterValidator underlyingErrorKeys:error], @[], nil);
+	XCTAssertEqualObjects([ParameterValidator underlyingErrorKeys:error], @[]);
 }
 
 - (void)testKeysForDictionaryParameterError {
@@ -280,7 +280,7 @@
 	[validator isPleasedWith:@{} error:&error];
 	NSArray *keys = [ParameterValidator underlyingErrorKeys:error];
 
-	STAssertEqualObjects(keys, (@[ @[@"param"] ]), nil);
+	XCTAssertEqualObjects(keys, (@[ @[@"param"] ]));
 }
 
 - (void)testKeysForMultipleDictionaryParameterErrors {
@@ -293,7 +293,7 @@
 	[validator isPleasedWith:@{@"arr": @[]} error:&error];
 	NSArray *keys = [ParameterValidator underlyingErrorKeys:error];
 
-	STAssertEqualObjects(keys, (@[ @[@"num"], @[@"str"] ]), nil);
+	XCTAssertEqualObjects(keys, (@[ @[@"num"], @[@"str"] ]));
 }
 
 - (void)testKeysForArrayParameterError {
@@ -303,7 +303,7 @@
 	[validator isPleasedWith:@[@"string"] error:&error];
 	NSArray *keys = [ParameterValidator underlyingErrorKeys:error];
 
-	STAssertEqualObjects(keys, (@[ @[@0] ]), nil);
+	XCTAssertEqualObjects(keys, (@[ @[@0] ]));
 }
 
 - (void)testKeysForMultipleArrayParameterErrors {
@@ -313,7 +313,7 @@
 	[validator isPleasedWith:@[@24, @"str1", @"str2", @25, @26] error:&error];
 	NSArray *keys = [ParameterValidator underlyingErrorKeys:error];
 
-	STAssertEqualObjects(keys, (@[ @[@1], @[@2] ]), nil);
+	XCTAssertEqualObjects(keys, (@[ @[@1], @[@2] ]));
 }
 
 - (void)testKeysForNestedDictionaryErrors {
@@ -338,7 +338,7 @@
 	[a isPleasedWith:dict error:&error];
 	NSArray *keys = [ParameterValidator underlyingErrorKeys:error];
 
-	STAssertEqualObjects(keys, (@[ @[@"b",@"c",@"num"], @[@"b",@"c",@"str"] ]), nil);
+	XCTAssertEqualObjects(keys, (@[ @[@"b",@"c",@"num"], @[@"b",@"c",@"str"] ]));
 }
 
 @end

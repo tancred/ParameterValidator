@@ -1,9 +1,11 @@
 CC = clang
-CFLAGS = -Wall -fobjc-arc -F/Applications/Xcode.app/Contents/Developer/Library/Frameworks
+PLATFORM_SDK_PATH=$(shell xcrun --show-sdk-platform-path)
+PLATFORM_FRAMEWORKS_PATH=$(PLATFORM_SDK_PATH)/Developer/Library/Frameworks
+CFLAGS = -Wall -fobjc-arc -F$(PLATFORM_FRAMEWORKS_PATH)
 PROGS = validparams
 
 default: validparams
-	DYLD_FRAMEWORK_PATH=/Applications/Xcode.app/Contents/Developer/Library/Frameworks ./validparams
+	DYLD_FRAMEWORK_PATH=$(PLATFORM_FRAMEWORKS_PATH) ./validparams 2>&1 | xcpretty -cs
 
 validparams: validparams.o \
 ParameterValidator.o \
@@ -14,7 +16,7 @@ StringValidatorTest.o \
 HexstringValidatorTest.o \
 ArrayValidatorTest.o \
 ErrorReportingTest.o
-	$(CC) -o $@ $(CFLAGS) $^ -framework Foundation -framework SenTestingKit
+	$(CC) -o $@ $(CFLAGS) $^ -framework Foundation -framework XCTest
 
 validparams.o: validparams.m
 ParameterValidator.o: ParameterValidator.m ParameterValidator.h

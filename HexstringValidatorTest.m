@@ -1,35 +1,35 @@
-#import <SenTestingKit/SenTestingKit.h>
+#import <XCTest/XCTest.h>
 #import "ParameterValidator.h"
 
-@interface HexstringValidatorTest : SenTestCase
+@interface HexstringValidatorTest : XCTestCase
 @end
 
 @implementation HexstringValidatorTest
 
 - (void)testInstance {
-	STAssertEqualObjects([[HexstringValidator validator] class], [HexstringValidator class], nil);
+	XCTAssertEqualObjects([[HexstringValidator validator] class], [HexstringValidator class]);
 }
 
 - (void)testConvenienceInstance {
-	STAssertEqualObjects([[ParameterValidator hexstring] class], [HexstringValidator class], nil);
+	XCTAssertEqualObjects([[ParameterValidator hexstring] class], [HexstringValidator class]);
 }
 
 - (void)testPleasedWithHexstring {
-	STAssertTrue([[ParameterValidator hexstring] isPleasedWith:@"abcdefABCDEF0123456789" error:nil], nil);
+	XCTAssert([[ParameterValidator hexstring] isPleasedWith:@"abcdefABCDEF0123456789" error:nil]);
 }
 
 - (void)testPerformsStringValidationsBeforeSpecificHexValidations {
 	NSError *error = nil;
-	STAssertFalse([[ParameterValidator hexstring] isPleasedWith:@2 error:&error], nil);
-	STAssertEqualObjects([error localizedDescription], @"must be a string", nil);
+	XCTAssertFalse([[ParameterValidator hexstring] isPleasedWith:@2 error:&error]);
+	XCTAssertEqualObjects([error localizedDescription], @"must be a string");
 
 	error = nil;
-	STAssertFalse([[[ParameterValidator hexstring] min:@3] isPleasedWith:@"to" error:&error], nil);
-	STAssertEqualObjects([error localizedDescription], @"must be at least 3 characters", nil);
+	XCTAssertFalse([[[ParameterValidator hexstring] min:@3] isPleasedWith:@"to" error:&error]);
+	XCTAssertEqualObjects([error localizedDescription], @"must be at least 3 characters");
 
 	error = nil;
-	STAssertFalse([[[ParameterValidator hexstring] length:@3] isPleasedWith:@"to" error:&error], nil);
-	STAssertEqualObjects([error localizedDescription], @"must be exactly 3 characters", nil);
+	XCTAssertFalse([[[ParameterValidator hexstring] length:@3] isPleasedWith:@"to" error:&error]);
+	XCTAssertEqualObjects([error localizedDescription], @"must be exactly 3 characters");
 }
 
 - (void)testNotPleasedWithNonHexstring {
@@ -40,23 +40,23 @@
 	// thorough test can be performed on the algorithm instead of the data, but let's not
 	// over-work this.
 	NSError *error = nil;
-	STAssertFalse([[ParameterValidator hexstring] isPleasedWith:@"a b" error:&error], nil);
-	STAssertEqualObjects([error localizedDescription], @"must be a hexstring", nil);
+	XCTAssertFalse([[ParameterValidator hexstring] isPleasedWith:@"a b" error:&error]);
+	XCTAssertEqualObjects([error localizedDescription], @"must be a hexstring");
 
 	error = nil;
-	STAssertFalse([[ParameterValidator hexstring] isPleasedWith:@" ab" error:&error], nil);
-	STAssertEqualObjects([error localizedDescription], @"must be a hexstring", nil);
+	XCTAssertFalse([[ParameterValidator hexstring] isPleasedWith:@" ab" error:&error]);
+	XCTAssertEqualObjects([error localizedDescription], @"must be a hexstring");
 
 	error = nil;
-	STAssertFalse([[ParameterValidator hexstring] isPleasedWith:@"ab " error:&error], nil);
-	STAssertEqualObjects([error localizedDescription], @"must be a hexstring", nil);
+	XCTAssertFalse([[ParameterValidator hexstring] isPleasedWith:@"ab " error:&error]);
+	XCTAssertEqualObjects([error localizedDescription], @"must be a hexstring");
 }
 
 - (void)testReportsLeafError {
 	NSError *error = nil;
-	STAssertFalse([[ParameterValidator hexstring] isPleasedWith:@"xyz" error:&error], nil);
-	STAssertEquals([error code], ParameterValidatorErrorCodeLeaf, nil);
-	STAssertEqualObjects([error domain], ParameterValidatorErrorDomain, nil);
+	XCTAssertFalse([[ParameterValidator hexstring] isPleasedWith:@"xyz" error:&error]);
+	XCTAssertEqual([error code], ParameterValidatorErrorCodeLeaf);
+	XCTAssertEqualObjects([error domain], ParameterValidatorErrorDomain);
 }
 
 @end
